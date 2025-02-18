@@ -65,6 +65,32 @@
               pkgs.cudatoolkit
             ]
           }:$LIBRARY_PATH
+          
+          run() {
+              if [ $# -ne 1 ]; then
+                  echo "Usage: run <cuda_source_file>"
+                  return 1
+              fi
+          
+              local file="$1"
+          
+              if [ ! -f "$file" ]; then
+                  echo "Error: File '$file' not found"
+                  return 1
+              fi
+          
+              # Compile the CUDA file
+              nvcc "$file"
+          
+              if [ $? -ne 0 ]; then
+                  echo "Compilation failed"
+                  return 1
+              fi
+          
+              # Run the compiled program
+              ./a.out
+          }
+
         '';
       };
     };
