@@ -29,6 +29,10 @@
               lcov
               vcpkg
               vcpkg-tool
+              cudatoolkit
+              copycat
+              git
+              gh
             ] ++ (if system == "aarch64-darwin" then [ ] else [ gdb ]);
           };
       });
