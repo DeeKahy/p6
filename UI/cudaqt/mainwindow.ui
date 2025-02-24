@@ -43,6 +43,17 @@
       </item>
      </widget>
     </item>
+    <item>
+     <widget class="QPlainTextEdit" name="plainTextEdit">
+      <property name="plainText">
+       <string>Petrinet Goes Here.
+
+a -&gt; b
+me -&gt; your pc
+</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
