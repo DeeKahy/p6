@@ -23,8 +23,7 @@ void MainWindow::on_send_clicked()
 
 void MainWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
-    ui->listWidget->removeItemWidget(item);
-    ui->listWidget->update();
+    ui->listWidget->takeItem(ui->listWidget->currentRow());
     qDebug() << "Brush:";
 }
 

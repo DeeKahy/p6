@@ -30,7 +30,18 @@
      </layout>
     </item>
     <item>
-     <widget class="QListWidget" name="listWidget"/>
+     <widget class="QListWidget" name="listWidget">
+      <item>
+       <property name="text">
+        <string>i like graphical user interfaces</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>pineapple</string>
+       </property>
+      </item>
+     </widget>
     </item>
    </layout>
   </widget>
