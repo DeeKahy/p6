@@ -80,3 +80,11 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 /build*/
+
+# Cmake files/directories
+*.cmake
+CMakeCache.txt
+cudaqt
+/.qt
+/CMakeFiles
+/cudaqt_autogen
