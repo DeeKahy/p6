@@ -5,9 +5,9 @@
 #include <chrono>
 struct Transition
 {
-    int* in;
+    int *in;
     int in_count;
-    int* out;
+    int *out;
     int out_count;
     float firing_time;
     bool ready = false;
@@ -15,24 +15,27 @@ struct Transition
 
 struct SPN
 {
-    Transition* transition;
+    Transition *transition;
     int transition_count;
-    int* places;
+    int *places;
     int places_count;
 };
 
-__global__ void simulate_spn(SPN* SPN, int steps) {
+__global__ void simulate_spn(SPN *SPN, int steps)
+{
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
-    for (int i = 0; i < SPN->transition_count; i++) {
+    for (int i = 0; i < SPN->transition_count; i++)
+    {
         bool is_ready = true;
 
         for (int j = 0; j < SPN->transition[i].in_count; j++)
         {
             int place_index = SPN->transition[i].in[j];
-            printf("Checking place[%d]: %d\n", place_index, SPN->places[place_index]);
 
-            if (SPN->places[place_index] <= 0) {
+
+            if (SPN->places[place_index] <= 0)
+            {
                 is_ready = false;
                 break;
             }
@@ -42,33 +45,38 @@ __global__ void simulate_spn(SPN* SPN, int steps) {
 
         // Initialize random state
         curandState state;
-        curand_init(clock64(), idx, 0, &state);
+        curand_init(clock64() + idx, idx, 0, &state);
         float u = curand_uniform(&state);
         SPN->transition[i].firing_time = -logf(u) / 2.0f;
     }
 
     // Find transition with the lowest firing time
-    Transition* next_transition = nullptr;
-    for (int i = 0; i < SPN->transition_count; i++) {
+    Transition *next_transition = nullptr;
+    for (int i = 0; i < SPN->transition_count; i++)
+    {
         if (SPN->transition[i].ready &&
-            (next_transition == nullptr || SPN->transition[i].firing_time < next_transition->firing_time)) {
+            (next_transition == nullptr || SPN->transition[i].firing_time < next_transition->firing_time))
+        {
             next_transition = &SPN->transition[i];
         }
     }
 
     // Ensure next_transition is valid
-    if (!next_transition) {
-        printf("No transition is ready.\n");
+    if (!next_transition)
+    {
+        // printf("No transition is ready.\n");
         return;
     }
 
     // Fire the transition
-    for (int i = 0; i < next_transition->in_count; i++) {
+    for (int i = 0; i < next_transition->in_count; i++)
+    {
         int index = next_transition->in[i];
         SPN->places[index] -= 1;
     }
 
-    for (int i = 0; i < next_transition->out_count; i++) {
+    for (int i = 0; i < next_transition->out_count; i++)
+    {
         int index = next_transition->out[i];
         SPN->places[index] += 1;
     }
@@ -78,19 +86,20 @@ __global__ void simulate_spn(SPN* SPN, int steps) {
     next_transition->ready = false;
 }
 
-int GetData() {
-    int h_places[3] = { 1,1,0 };
-    int h_in1[] = { 0 }, h_out1[] = { 1 };
-    int h_in2[] = { 1 }, h_out2[] = { 2 };
-    int h_in3[] = { 2 }, h_out3[] = { 0 };
+int GetData(int calculations)
+{
+    int h_places[3] = {1, 1, 0};
+    int h_in1[] = {0}, h_out1[] = {1};
+    int h_in2[] = {1}, h_out2[] = {2};
+    int h_in3[] = {2}, h_out3[] = {0};
 
     Transition h_transitions[3];
 
     // Device memory allocation
-    SPN* d_spn;
-    Transition* d_transitions;
-    int* d_places;
-    int* d_in1, * d_out1, * d_in2, * d_out2, * d_in3, * d_out3;
+    SPN *d_spn;
+    Transition *d_transitions;
+    int *d_places;
+    int *d_in1, *d_out1, *d_in2, *d_out2, *d_in3, *d_out3;
 
     cudaMalloc(&d_spn, sizeof(SPN));
     cudaMalloc(&d_transitions, sizeof(h_transitions));
@@ -113,9 +122,9 @@ int GetData() {
     cudaMemcpy(d_out3, h_out3, sizeof(h_out3), cudaMemcpyHostToDevice);
 
     // Initialize transitions with device pointers
-    h_transitions[0] = { d_in1, 1, d_out1, 1, 0, false };
-    h_transitions[1] = { d_in2, 1, d_out2, 1, 0, false };
-    h_transitions[2] = { d_in3, 1, d_out3, 1, 0, false };
+    h_transitions[0] = {d_in1, 1, d_out1, 1, 0, false};
+    h_transitions[1] = {d_in2, 1, d_out2, 1, 0, false};
+    h_transitions[2] = {d_in3, 1, d_out3, 1, 0, false};
 
     cudaMemcpy(d_transitions, h_transitions, sizeof(h_transitions), cudaMemcpyHostToDevice);
 
@@ -127,17 +136,28 @@ int GetData() {
     h_spn.places_count = 3;
 
     cudaMemcpy(d_spn, &h_spn, sizeof(SPN), cudaMemcpyHostToDevice);
-
     // Launch kernel
-    simulate_spn << <1, 1 >> > (d_spn, 20);
-    cudaDeviceSynchronize();
+    int numberBlocks = floor(calculations / 1024);
+    int numberThreadsOver = calculations % 1024;
+    if(numberBlocks >= 1){
+        simulate_spn<<<numberBlocks, 1024>>>(d_spn, 20);
+        cudaDeviceSynchronize();
+        simulate_spn<<<1, numberThreadsOver>>>(d_spn, 20);
+        cudaDeviceSynchronize();
+    }
+    else{
+        simulate_spn<<<1, calculations>>>(d_spn, 20);
+        cudaDeviceSynchronize();
+    }
+
 
     // Copy results back
     cudaMemcpy(h_places, d_places, sizeof(h_places), cudaMemcpyDeviceToHost);
 
     // Print results
     std::cout << "Final places: ";
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         std::cout << h_places[i] << " ";
     }
     std::cout << std::endl;
@@ -155,15 +175,16 @@ int GetData() {
 
     return 0;
 }
-int time(){
+int time(int calculations)
+{
     auto start = std::chrono::high_resolution_clock::now();
-    GetData();
+    GetData(calculations);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     return duration.count();
 }
 int main()
 {
-    std::cout << time() << std::endl;
+    std::cout << time(1) << std::endl;
     return 0;
 }
