@@ -2,7 +2,7 @@
 #include "device_launch_parameters.h"
 #include <curand_kernel.h>
 #include <iostream>
-
+#include <chrono>
 struct Transition
 {
     int* in;
@@ -78,7 +78,7 @@ __global__ void simulate_spn(SPN* SPN, int steps) {
     next_transition->ready = false;
 }
 
-int main() {
+int GetData() {
     int h_places[3] = { 1,1,0 };
     int h_in1[] = { 0 }, h_out1[] = { 1 };
     int h_in2[] = { 1 }, h_out2[] = { 2 };
@@ -153,5 +153,17 @@ int main() {
     cudaFree(d_in3);
     cudaFree(d_out3);
 
+    return 0;
+}
+int time(){
+    auto start = std::chrono::high_resolution_clock::now();
+    GetData();
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    return duration.count();
+}
+int main()
+{
+    std::cout << time() << std::endl;
     return 0;
 }
