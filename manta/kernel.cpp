@@ -1,6 +1,5 @@
 #include <functional>
 #include <random>
-#include <stdio.h>
 #include <iostream>
 #include <vector>
 struct Transition {
@@ -30,10 +29,11 @@ int main()
 	timeIncrease.to = 0;
 	timeIncrease.guard[0] = 0;
 	timeIncrease.guard[1] = std::numeric_limits<float>::max();
-	timeIncrease.functionToRun = [](float* value) {
+	std::random_device rd;
+	std::mt19937 gen(rd());
 
-		std::random_device rd;
-		std::mt19937 gen(rd());
+	timeIncrease.functionToRun = [&gen](float* value) {
+
 		std::uniform_real_distribution<> dis(0.0, 1.0);
 		float randomValue = dis(gen);
 		*value += randomValue;
@@ -51,7 +51,7 @@ int main()
 
 		};
 	euler.transitions.push_back(timeOut);
-	const float EPSILON = 0.001f;
+	const float EPSILON = 0.0001f;
 	for (size_t i = 0; i < 1000000; i++)
 	{
 		int timesFired = 0;
