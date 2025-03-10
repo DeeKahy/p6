@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QtWidgets/qlistwidget.h>
+#include <QtCharts>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,11 +20,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_send_clicked();
-
-    void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
+    void on_startBTN_clicked();
+    void updateChart();
 
 private:
     Ui::MainWindow *ui;
+    QChart *chart;
+    QChartView *chartView;
+    QLineSeries *series;
 };
 #endif // MAINWINDOW_H
