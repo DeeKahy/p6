@@ -119,15 +119,33 @@ int main()
     timeOut.functionType = TIME_OUT;
     euler.transitions[1] = timeOut;
 
+    // Calculate optimal thread and block configuration
+    const int maxThreadsPerBlock = 1024;  // Maximum threads per block for most GPUs
+    int threadsPerBlock = std::min(maxThreadsPerBlock, TOTAL_RUNS);
+    
+    // Calculate how many blocks we need
+    int totalBlocks = (TOTAL_RUNS + threadsPerBlock - 1) / threadsPerBlock;
+    // Limit blocks to a reasonable number to avoid memory issues
+    const int maxBlocks = 65535;  // A reasonable maximum
+    totalBlocks = std::min(totalBlocks, maxBlocks);
+
+    // Calculate actual number of parallel simulations
+    const int numSimulations = threadsPerBlock * totalBlocks;
+    
+    // Calculate how many iterations we need to reach TOTAL_RUNS
+    const int numIterations = (TOTAL_RUNS + numSimulations - 1) / numSimulations;
+
+    std::cout << "Configuration:" << std::endl;
+    std::cout << "Threads per block: " << threadsPerBlock << std::endl;
+    std::cout << "Number of blocks: " << totalBlocks << std::endl;
+    std::cout << "Parallel simulations: " << numSimulations << std::endl;
+    std::cout << "Number of iterations: " << numIterations << std::endl;
+    std::cout << "Total runs targeted: " << TOTAL_RUNS << std::endl;
+
     // Allocate memory on the device for Euler struct
     Euler* d_euler;
     checkCudaErrors(cudaMalloc((void**)&d_euler, sizeof(Euler)));
     checkCudaErrors(cudaMemcpy(d_euler, &euler, sizeof(Euler), cudaMemcpyHostToDevice));
-
-    // Number of threads and blocks
-    const int numThreads = 1024; // please use/change this to get a somewhat accurate number of runs
-    const int numBlocks = 3000; // please use/change this to get a somewhat accurate number of runs
-    const int numSimulations = numThreads * numBlocks;
 
     // Allocate arrays for return values
     int* d_counts;
@@ -144,19 +162,18 @@ int main()
     checkCudaErrors(cudaMalloc((void**)&d_states, numSimulations * sizeof(curandState)));
 
     std::cout << "Initializing CURAND states..." << std::endl;
-    initCurandStates << <numBlocks, numThreads >> > (d_states, time(0));
+    initCurandStates<<<totalBlocks, threadsPerBlock>>>(d_states, time(0));
     checkCudaErrors(cudaDeviceSynchronize());
 
     std::cout << "Running simulation..." << std::endl;
-    // Launch the kernel with Euler struct
-
-    for (size_t i = 0; i < 10000; i++) // please use/change this to get a somewhat accurate number of runs
-    {
-        simulate << <numBlocks, numThreads >> > (d_euler, d_counts, d_values, d_states);
+    // Launch the kernel with calculated iterations
+    for (int i = 0; i < numIterations; i++) {
+        simulate<<<totalBlocks, threadsPerBlock>>>(d_euler, d_counts, d_values, d_states);
         checkCudaErrors(cudaDeviceSynchronize());
-
+        if (i % 100 == 0) {
+            std::cout << "Completed iteration " << i << " of " << numIterations << std::endl;
+        }
     }
-
 
     // Check for errors after kernel execution
     checkCudaErrors(cudaGetLastError());
