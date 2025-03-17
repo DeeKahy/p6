@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+#define TOTAL_RUNS 10000 // please use/change this to get a somewhat accurate number of runs
+
 // Helper function to check CUDA errors
 #define checkCudaErrors(call) { \
     cudaError_t err = call; \
@@ -123,8 +125,8 @@ int main()
     checkCudaErrors(cudaMemcpy(d_euler, &euler, sizeof(Euler), cudaMemcpyHostToDevice));
 
     // Number of threads and blocks
-    const int numThreads = 1024;
-    const int numBlocks = 3000;
+    const int numThreads = 1024; // please use/change this to get a somewhat accurate number of runs
+    const int numBlocks = 3000; // please use/change this to get a somewhat accurate number of runs
     const int numSimulations = numThreads * numBlocks;
 
     // Allocate arrays for return values
@@ -148,12 +150,12 @@ int main()
     std::cout << "Running simulation..." << std::endl;
     // Launch the kernel with Euler struct
 
-    // for (size_t i = 0; i < 10000; i++)
-    // {
+    for (size_t i = 0; i < 10000; i++) // please use/change this to get a somewhat accurate number of runs
+    {
         simulate << <numBlocks, numThreads >> > (d_euler, d_counts, d_values, d_states);
         checkCudaErrors(cudaDeviceSynchronize());
 
-    // }
+    }
 
 
     // Check for errors after kernel execution
