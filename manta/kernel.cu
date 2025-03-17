@@ -70,21 +70,24 @@ __global__ void simulate(Euler* euler, int* counts, float* values, curandState* 
 
     while (!shouldBreak) {
         // Always select the TIME_INCREASE transition until test > 1.0f
-        if (test <= 1.0f) {
-            // Use the first transition (TIME_INCREASE)
-            callFunction(euler->transitions[0].functionType, &test, state);
-            timesFired++;
+        Transition youngest = euler->transitions[0];
+        for (size_t i = 0; i < 2; i++)
+        {
+            if (test >= euler->transitions[i].guard[0] && youngest.guard[0] < euler->transitions[i].guard[0])
+            {
+                youngest = euler->transitions[i];
+            }
         }
-        else {
-            // Use the second transition (TIME_OUT) when test > 1.0f
-            callFunction(euler->transitions[1].functionType, &test, state);
+        callFunction(youngest.functionType, &test, state);
+        timesFired++;
+        if (test >= 1.0f) {
             shouldBreak = true;
         }
     }
 
     // Store the count (this approximates e)
-    counts[tid] = 1;
-    values[tid] = timesFired;
+    counts[tid] += 1;
+    values[tid] += timesFired;
 }
 
 __global__ void initCurandStates(curandState* states, unsigned long seed)
@@ -121,7 +124,7 @@ int main()
 
     // Number of threads and blocks
     const int numThreads = 1024;
-    const int numBlocks = 1000;
+    const int numBlocks = 3000;
     const int numSimulations = numThreads * numBlocks;
 
     // Allocate arrays for return values
@@ -144,8 +147,14 @@ int main()
 
     std::cout << "Running simulation..." << std::endl;
     // Launch the kernel with Euler struct
-    simulate << <numBlocks, numThreads >> > (d_euler, d_counts, d_values, d_states);
-    checkCudaErrors(cudaDeviceSynchronize());
+
+    // for (size_t i = 0; i < 10000; i++)
+    // {
+        simulate << <numBlocks, numThreads >> > (d_euler, d_counts, d_values, d_states);
+        checkCudaErrors(cudaDeviceSynchronize());
+
+    // }
+
 
     // Check for errors after kernel execution
     checkCudaErrors(cudaGetLastError());
@@ -166,10 +175,11 @@ int main()
     cudaFree(d_states);
 
     // Process results on the host
-    int totalCounts = 0;
+    double totalCounts = 0;
     float totalValues = 0;
     for (int i = 0; i < numSimulations; ++i)
     {
+        // std::cout << h_counts[i] << " " << h_values[i] << "\n";
         totalCounts += h_counts[i];
         totalValues += h_values[i];
     }
@@ -179,6 +189,7 @@ int main()
         float approxE = totalValues / totalCounts;
         std::cout << "Approximation of e: " << approxE << std::endl;
         std::cout << "True value of e: 2.71828..." << std::endl;
+        std::cout << numSimulations << std::endl;
     }
     else
     {
