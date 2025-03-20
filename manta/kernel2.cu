@@ -135,11 +135,12 @@ int main(int argc, char *argv[]) {
 	cudaDeviceSynchronize();
 	sum << <1, 1 >> > (d_results, numSimulations);
 	cudaDeviceSynchronize();
-	std::cout << "True value of e: 2.71828..." << std::endl;
+	std::cout << "True value of e: 2.71828... \n";
 	delete[] results;
 	cudaFree(d_results);
 	cudaFree(d_states);
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-	return duration.count();
+	std::cout << "time run: " << duration.count(); << std::endl;
+	return 0;
 }
