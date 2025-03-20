@@ -3,7 +3,7 @@
 #include <curand_kernel.h>
 #include <iostream>
 #include <vector>
-
+#include <chrono>
 // Helper function to check CUDA errors
 #define checkCudaErrors(call) { \
     cudaError_t err = call; \
@@ -115,10 +115,12 @@ __global__ void summage(float* array, int gridSize) {
 	array[tid] = sum;
 }
 
-int main() {
-	int gridSize = 80;
+int main(int argc, char *argv[]) {
+	auto start = std::chrono::high_resolution_clock::now();
+	int gridSize = std::stoi(argv[1]);
 	int blockSize = 1024;
 	int numSimulations = gridSize * blockSize;
+	
 	float* results = new float[numSimulations];
 	float* d_results;
 	cudaMalloc((void**)&d_results, numSimulations * sizeof(float));
@@ -137,5 +139,7 @@ int main() {
 	delete[] results;
 	cudaFree(d_results);
 	cudaFree(d_states);
-
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	return duration.count();
 }
