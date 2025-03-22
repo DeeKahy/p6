@@ -117,7 +117,7 @@ __global__ void summage(float* array, int gridSize) {
 
 int main(int argc, char *argv[]) {
 	auto start = std::chrono::high_resolution_clock::now();
-	int gridSize = std::stoi(argv[1]);
+	int gridSize = argc > 1 ? std::stoi(argv[1]) : 1000;
 	int blockSize = 1024;
 	int numSimulations = gridSize * blockSize;
 	
@@ -141,6 +141,6 @@ int main(int argc, char *argv[]) {
 	cudaFree(d_states);
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-	std::cout << "time run: " << duration.count(); << std::endl;
+	std::cout << "time run: " << duration.count() << std::endl;
 	return 0;
 }
