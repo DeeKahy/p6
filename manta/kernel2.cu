@@ -19,6 +19,7 @@ struct Transition
 	int type;
 	int from;
 	int to;
+	bool done {false};
 	float guard[2];
 	void(*function)(float*, float*);
 };
@@ -28,6 +29,7 @@ struct Euler
 	int timesFired{ 0 };
 	int timesCalled{ 0 };
 	float places[2]{ 0 };
+	int tokens[2]{ 1, 0 };
 	bool success{ false };
 	Transition transitions[2];
 };
@@ -52,7 +54,7 @@ __device__ void simulateThread(Euler* euler) {
 		Transition youngest = euler->transitions[0];
 		for (size_t i = 0; i < 2; i++)
 		{
-			if (euler->places[0] >= euler->transitions[i].guard[0] && youngest.guard[0] < euler->transitions[i].guard[0])
+			if (euler->places[0] >= euler->transitions[i].guard[0] && youngest.guard[0] < euler->transitions[i].guard[0] && euler->tokens[euler->transitions[i].from] > 0)
 			{
 				youngest = euler->transitions[i];
 			}
@@ -60,7 +62,7 @@ __device__ void simulateThread(Euler* euler) {
 		youngest.function(&euler->places[youngest.from], &euler->places[youngest.to]);
 
 
-		if (euler->places[youngest.from] == 0.0f) {
+		if (youngest.done == true) {
 			shouldBreak = true;
 		}
 		else {
@@ -87,6 +89,7 @@ __global__ void initThread(float* results) {
 	timeOut.guard[0] = 1.0f;
 	timeOut.guard[1] = 100000.0f;
 	timeOut.function = &reset;
+	timeOut.done = true;
 	euler.transitions[1] = timeOut;
 	simulateThread(&euler);
 
@@ -104,11 +107,11 @@ __global__ void sum(float* array, int numSimulations) {
 	}
 	printf("euler value is %f\n", total / numSimulations);
 }
-__global__ void summage(float* array, int gridSize) {
+__global__ void summage(float* array, int numSimulations) {
 	int tid = threadIdx.x;
 	float sum = 0.0f;
 
-	for (int i = 0; i < gridSize/1024; i++) {
+	for (int i = 0; i < numSimulations/1024; i++) {
 		sum += array[tid + i * 1024];
 	}
 
