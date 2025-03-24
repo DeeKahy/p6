@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <string>
 // Helper function to check CUDA errors
 #define checkCudaErrors(call) { \
     cudaError_t err = call; \
@@ -19,7 +20,7 @@ struct Transition
 	int type;
 	int from;
 	int to;
-	bool done {false};
+	bool done{ false };
 	float guard[2];
 	void(*function)(float*, float*);
 };
@@ -111,20 +112,19 @@ __global__ void summage(float* array, int numSimulations) {
 	int tid = threadIdx.x;
 	float sum = 0.0f;
 
-	for (int i = 0; i < numSimulations/1024; i++) {
+	for (int i = 0; i < numSimulations / 1024; i++) {
 		sum += array[tid + i * 1024];
 	}
 
 	array[tid] = sum;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 	auto start = std::chrono::high_resolution_clock::now();
 	int gridSize = argc > 1 ? std::stoi(argv[1]) : 1000;
 	int blockSize = 1024;
 	int numSimulations = gridSize * blockSize;
-	
-	float* results = new float[numSimulations];
+
 	float* d_results;
 	cudaMalloc((void**)&d_results, numSimulations * sizeof(float));
 	curandState* d_states;
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 	sum << <1, 1 >> > (d_results, numSimulations);
 	cudaDeviceSynchronize();
 	std::cout << "True value of e: 2.71828... \n";
-	delete[] results;
+
 	cudaFree(d_results);
 	cudaFree(d_states);
 	auto stop = std::chrono::high_resolution_clock::now();
