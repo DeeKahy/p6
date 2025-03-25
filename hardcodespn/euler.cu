@@ -121,14 +121,13 @@ __global__ void summage(float* array, int numSimulations) {
 
 int main(int argc, char* argv[]) {
 	auto start = std::chrono::high_resolution_clock::now();
-	int gridSize = argc > 1 ? std::stoi(argv[1]) : 1000;
+
+	int gridSize = argc > 1 ? std::stoi(argv[1]) / 1024 < 1 ? 1 : std::stoi(argv[1]) / 1024 : 1000;
 	int blockSize = 1024;
 	int numSimulations = gridSize * blockSize;
 	float* d_results;
 	cudaMalloc((void**)&d_results, numSimulations * sizeof(float));
 	initThread << <gridSize, blockSize >> > (d_results);
-	cudaDeviceSynchronize();
-
 	summage << <1, blockSize >> > (d_results, numSimulations);
 	cudaDeviceSynchronize();
 	sum << <1, 1 >> > (d_results, numSimulations);
