@@ -21,18 +21,12 @@
             packages = with pkgs; [
               clang-tools
               cmake
-              codespell
-              conan
-              cppcheck
-              doxygen
-              gtest
-              lcov
-              vcpkg
-              vcpkg-tool
-              cudatoolkit
               copycat
               git
               gh
+              python313
+              python313Packages.matplotlib
+              python313Packages.numpy
             ] ++ (if system == "aarch64-darwin" then [ ] else [ gdb ]);
           };
       });
