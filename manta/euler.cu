@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <string>
 // Helper function to check CUDA errors
 #define checkCudaErrors(call) { \
     cudaError_t err = call; \
@@ -19,6 +20,7 @@ struct Transition
 	int type;
 	int from;
 	int to;
+	bool done{ false };
 	float guard[2];
 	void(*function)(float*, float*);
 };
@@ -28,6 +30,7 @@ struct Euler
 	int timesFired{ 0 };
 	int timesCalled{ 0 };
 	float places[2]{ 0 };
+	int tokens[2]{ 1, 0 };
 	bool success{ false };
 	Transition transitions[2];
 };
@@ -52,7 +55,7 @@ __device__ void simulateThread(Euler* euler) {
 		Transition youngest = euler->transitions[0];
 		for (size_t i = 0; i < 2; i++)
 		{
-			if (euler->places[0] >= euler->transitions[i].guard[0] && youngest.guard[0] < euler->transitions[i].guard[0])
+			if (euler->places[0] >= euler->transitions[i].guard[0] && youngest.guard[0] < euler->transitions[i].guard[0] && euler->tokens[euler->transitions[i].from] > 0)
 			{
 				youngest = euler->transitions[i];
 			}
@@ -60,7 +63,7 @@ __device__ void simulateThread(Euler* euler) {
 		youngest.function(&euler->places[youngest.from], &euler->places[youngest.to]);
 
 
-		if (euler->places[youngest.from] == 0.0f) {
+		if (youngest.done == true) {
 			shouldBreak = true;
 		}
 		else {
@@ -87,6 +90,7 @@ __global__ void initThread(float* results) {
 	timeOut.guard[0] = 1.0f;
 	timeOut.guard[1] = 100000.0f;
 	timeOut.function = &reset;
+	timeOut.done = true;
 	euler.transitions[1] = timeOut;
 	simulateThread(&euler);
 
@@ -104,30 +108,24 @@ __global__ void sum(float* array, int numSimulations) {
 	}
 	printf("euler value is %f\n", total / numSimulations);
 }
-__global__ void summage(float* array, int gridSize) {
+__global__ void summage(float* array, int numSimulations) {
 	int tid = threadIdx.x;
 	float sum = 0.0f;
 
-	for (int i = 0; i < gridSize/1024; i++) {
+	for (int i = 0; i < numSimulations / 1024; i++) {
 		sum += array[tid + i * 1024];
 	}
 
 	array[tid] = sum;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
 	auto start = std::chrono::high_resolution_clock::now();
 	int gridSize = argc > 1 ? std::stoi(argv[1]) : 1000;
 	int blockSize = 1024;
 	int numSimulations = gridSize * blockSize;
-	
-	float* results = new float[numSimulations];
 	float* d_results;
 	cudaMalloc((void**)&d_results, numSimulations * sizeof(float));
-	curandState* d_states;
-	cudaMalloc((void**)&d_states, numSimulations * sizeof(curandState));
-	initCurandStates << <gridSize, blockSize >> > (d_states, time(0));
-	cudaDeviceSynchronize();
 	initThread << <gridSize, blockSize >> > (d_results);
 	cudaDeviceSynchronize();
 
@@ -136,9 +134,7 @@ int main(int argc, char *argv[]) {
 	sum << <1, 1 >> > (d_results, numSimulations);
 	cudaDeviceSynchronize();
 	std::cout << "True value of e: 2.71828... \n";
-	delete[] results;
 	cudaFree(d_results);
-	cudaFree(d_states);
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	std::cout << "time run: " << duration.count() << std::endl;
