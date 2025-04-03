@@ -5,9 +5,8 @@ project(PNMLParser)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Include Conan-generated cmake files
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+# Find pugixml package
+find_package(pugixml REQUIRED)
 
 # Add include directories
 include_directories(include)
@@ -22,4 +21,4 @@ set(SOURCES
 
 # Create executable
 add_executable(pnml_parser ${SOURCES})
-target_link_libraries(pnml_parser ${CONAN_LIBS})
+target_link_libraries(pnml_parser pugixml)
