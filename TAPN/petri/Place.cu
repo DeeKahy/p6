@@ -3,28 +3,29 @@
 /**
  * @brief Checks if the invariant in a place holds for tokenCount amount of tokens and returns using pass by reference
  *
- * @param place reference to the place invariantHold works on
  * @param tokenCount the amount of tokens that needs to hold the invariant
  * @param returne a pointer to where the boolean result is returned
  * @return Returns true if an invariant holds for tokenCount amount of tokens
  */
-__device__ void invariantHold(Place *place, int tokenCount, bool *returne)
+__device__ void Place::invariantHold(int tokenCount, bool *returne)
 {
-    if (tokenCount > place->tokenCount)
+    if (tokenCount > this->tokenCount)
     {
         *returne = false;
         return;
     }
-    if (&place->invariant == nullptr)
+
+    if (&invariant == nullptr)
     {
         *returne = true;
         return;
     }
+    
     int count{0};
-    for (size_t i = 0; i < place->tokenCount; i++)
+    for (size_t i = 0; i < this->tokenCount; i++)
     {
         bool result;
-        place->invariant.condition(&place->tokens[i], &result);
+        this->invariant.condition(&this->tokens[i], &result);
         if (result)
         {
             count++;
@@ -42,18 +43,18 @@ __device__ void invariantHold(Place *place, int tokenCount, bool *returne)
  * @param removedTokens a pointer to the where the removed tokens should go
  * @return returns the removed tokens into the removedTokens pointer
  */
-__device__ void removeTokens(Place *place, int amount, float *removedTokens)
+__device__ void Place::removeTokens(int amount, float *removedTokens)
 {
     for (size_t i = 0; i < amount; i++)
     {
-        for (size_t j = 0; j < place->tokenCount; j++)
+        for (size_t j = 0; j < this->tokenCount; j++)
         {
-            if (removedTokens[i] > place->tokens[j])
+            if (removedTokens[i] > this->tokens[j])
             {
-                removedTokens[i] = place->tokens[j];
-                place->tokens[j] = MAXFLOAT;
-                place->tokenCount--;
-                shiftTokens(place);
+                removedTokens[i] = this->tokens[j];
+                this->tokens[j] = MAXFLOAT;
+                this->tokenCount--;
+                this->shiftTokens();
             }
         }
     }
@@ -68,15 +69,15 @@ __device__ void removeTokens(Place *place, int amount, float *removedTokens)
  * @param returne a pointer to a bool for returning the result
  * @return if enough tokens hold the timing
  */
-__device__ void tokensHold(Place *place, int amount, float timing[2], bool *returne)
+__device__ void Place::tokensHold(int amount, float timing[2], bool *returne)
 {
     float minAge = timing[0];
     float maxAge = timing[1];
 
     int count{0};
-    for (size_t i = 0; i < place->tokenCount; i++)
+    for (size_t i = 0; i < this->tokenCount; i++)
     {
-        if (place->tokens[i] > minAge && place->tokens[i] < maxAge)
+        if (this->tokens[i] > minAge && this->tokens[i] < maxAge)
         {
             count++;
         }
@@ -92,9 +93,9 @@ __device__ void tokensHold(Place *place, int amount, float timing[2], bool *retu
  *
  * @return nothing
  */
-__device__ void addTokens(Place *place, float *token)
+__device__ void Place::addTokens(float *token)
 {
-    place->tokens[place->tokenCount++] = *token;
+    this->tokens[this->tokenCount++] = *token;
 }
 
 /**
@@ -103,14 +104,14 @@ __device__ void addTokens(Place *place, float *token)
  * @param place on which the tokens should be shifted
  * @return works on the array in place
  */
-__device__ void shiftTokens(Place *place)
+__device__ void Place::shiftTokens()
 {
     bool needsToShift{false};
     int foundAt{0};
     // Check if the first tokens up to tokenCount are not tokens
-    for (size_t i = 0; i < place->tokenCount; i++)
+    for (size_t i = 0; i < this->tokenCount; i++)
     {
-        if (place->tokens[i] == MAXFLOAT)
+        if (this->tokens[i] == MAXFLOAT)
         {
             foundAt = i;
             needsToShift = true;
@@ -122,8 +123,8 @@ __device__ void shiftTokens(Place *place)
         return;
     }
 
-    for (size_t i = foundAt; i <= place->tokenCount; i++)
+    for (size_t i = foundAt; i <= this->tokenCount; i++)
     {
-        place->tokens[i] = place->tokens[i + 1];
+        this->tokens[i] = this->tokens[i + 1];
     }
 }

@@ -11,8 +11,10 @@ struct Place
     int tokenCount;
     Invariant invariant{nullptr};
     int invariantCount;
+
+    void tokensHold(int amount, float timing[2], bool *returne);
+    void invariantHold(int tokenCount, bool *returne);
+    void addTokens(float *token);
+    void removeTokens(int amount, float* removedTokens);
+    void shiftTokens();
 };
-void tokensHold(Place* place,int amount, float timing[2], bool *returne);
-void invariantHold(Place *place, int tokenCount, bool *returne);
-void addTokens(Place *place, float *token);
-void removeTokens(Place *place, int amount, float* removedTokens);
