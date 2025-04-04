@@ -1,13 +1,11 @@
 #include "Place.h"
 
 /**
- * Checks if the invariant in a place holds for tokenCount amount of tokens and returns
- * using pass by reference
+ * @brief Checks if the invariant in a place holds for tokenCount amount of tokens and returns using pass by reference
  *
  * @param place reference to the place invariantHold works on
  * @param tokenCount the amount of tokens that needs to hold the invariant
  * @param returne a pointer to where the boolean result is returned
- *
  * @return Returns true if an invariant holds for tokenCount amount of tokens
  */
 __device__ void invariantHold(Place *place, int tokenCount, bool *returne)
@@ -37,12 +35,11 @@ __device__ void invariantHold(Place *place, int tokenCount, bool *returne)
 }
 
 /**
- * Removes an amount of youngest tokens from a place
+ * @brief Removes an amount of youngest tokens from a place
  *
  * @param place from which removeTokens should remove tokens from
  * @param amount of tokens to remove
  * @param removedTokens a pointer to the where the removed tokens should go
- *
  * @return returns the removed tokens into the removedTokens pointer
  */
 __device__ void removeTokens(Place *place, int amount, float *removedTokens)
@@ -55,19 +52,20 @@ __device__ void removeTokens(Place *place, int amount, float *removedTokens)
             {
                 removedTokens[i] = place->tokens[j];
                 place->tokens[j] = MAXFLOAT;
+                place->tokenCount--;
+                shiftTokens(place);
             }
         }
     }
 }
 
 /**
- * Checks if an amount of tokens hold the timing required by an arc
+ * @brief Checks if an amount of tokens hold the timing required by an arc
  *
  * @param place the place from which the tokens need to hold
  * @param amount of tokens that should hold
  * @param timing an array of two floates describing the timing eg. a - b
  * @param returne a pointer to a bool for returning the result
- *
  * @return if enough tokens hold the timing
  */
 __device__ void tokensHold(Place *place, int amount, float timing[2], bool *returne)
@@ -87,7 +85,7 @@ __device__ void tokensHold(Place *place, int amount, float timing[2], bool *retu
 }
 
 /**
- * Adds tokens to a place
+ * @brief Adds tokens to a place
  *
  * @param place to which the tokens should go
  * @param token to add to the place's tokens
@@ -97,4 +95,35 @@ __device__ void tokensHold(Place *place, int amount, float timing[2], bool *retu
 __device__ void addTokens(Place *place, float *token)
 {
     place->tokens[place->tokenCount++] = *token;
+}
+
+/**
+ * @brief shifts tokens in a place's token array to the left
+ *
+ * @param place on which the tokens should be shifted
+ * @return works on the array in place
+ */
+__device__ void shiftTokens(Place *place)
+{
+    bool needsToShift{false};
+    int foundAt{0};
+    // Check if the first tokens up to tokenCount are not tokens
+    for (size_t i = 0; i < place->tokenCount; i++)
+    {
+        if (place->tokens[i] == MAXFLOAT)
+        {
+            foundAt = i;
+            needsToShift = true;
+        }
+    }
+
+    if (!needsToShift)
+    {
+        return;
+    }
+
+    for (size_t i = foundAt; i <= place->tokenCount; i++)
+    {
+        place->tokens[i] = place->tokens[i + 1];
+    }
 }
