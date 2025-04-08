@@ -1,20 +1,19 @@
 #pragma once
 #include "Invariants.h"
-#include "Place.cu"
 #include <string>
 
 struct Place
 {
     int id;
-    string name;
-    float tokens[8];
+
+    float tokens[8] {6.0f};
     int tokenCount;
-    Invariant invariant{nullptr};
+    Invariant* invariant{nullptr};
     int invariantCount;
 
-    void tokensHold(int amount, float timing[2], bool *returne);
-    void invariantHold(int tokenCount, bool *returne);
-    void addTokens(float *token);
-    void removeTokens(int amount, float* removedTokens);
-    void shiftTokens();
+    __device__ void tokensHold(int amount, float timing[2], bool *returne);
+    __device__ void invariantHold(int tokenCount, bool *returne);
+    __device__ void addTokens(float *token);
+    __device__ void removeTokens(int amount, float* removedTokens);
+    __device__ void shiftTokens();
 };

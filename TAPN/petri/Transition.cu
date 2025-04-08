@@ -1,0 +1,94 @@
+#include "Transition.h"
+
+__device__ void Transition::isReady(bool *result)
+{
+    for (size_t i = 0; i < inputArcsCount; i++)
+    {
+        // Check if transition can fire
+        bool transitionCanFire = false;
+        inputArcs[i].canFire(&transitionCanFire);
+        if (!transitionCanFire)
+        {
+            *result = false;
+            return;
+        }
+    }
+
+    if (!urgent)
+    {
+        float result;
+        distribution.sample(&result);
+        firingTime = result;
+    }
+    else
+    {
+        firingTime = 0.0f;
+    }
+
+    *result = true;
+}
+
+__device__ void Transition::fire(float *consumed, int consumedCount, int *consumedAmout)
+{
+    printf("Transition firing \n");
+    for (size_t i = 0; i < inputArcsCount; i++)
+    {
+        switch (inputArcs[i].type)
+        {
+        case INPUT:
+            inputArcs[i].fire(consumed, consumedAmout);
+            break;
+        case TRANSPORT:
+            inputArcs[i].fire(consumed, consumedAmout);
+            break;
+        case INHIBITOR:
+            // Inhibitor arcs don't consume tokens
+            inputArcs[i].fire(consumed, consumedAmout);
+            break;
+        default:
+            printf("could not find type");
+            break;
+        }
+    }
+
+    if (outputArcsCount == 0)
+    {
+        printf("No output arcs \n");
+        return;
+    }
+
+    for (size_t i = 0; i < outputArcsCount; i++)
+    {
+        bool success;
+        printf("Firing outputs \n");
+        if (outputArcs[i].isTransport)
+        {
+            outputArcs[i].fire(consumed, consumedCount, &success);
+        }
+        else
+        {
+            outputArcs[i].fire(consumed, consumedCount, &success);
+        }
+        printf("Firing outputs \n");
+    }
+}
+
+__device__ void Distribution::sample(float *result)
+{
+    switch (type)
+    {
+    case CONSTANT:
+        // For constant values a is used as the value returned
+        *result = a;
+        break;
+    case UNIFORM:
+        float min = a;
+        float max = b;
+        curandState state;
+        int tid = blockIdx.x * blockDim.x + threadIdx.x;
+        curand_init(clock64() + tid, tid, 0, &state);
+        float random = curand_uniform(&state);
+        *result = (min + random * (max - min));
+        break;
+    }
+}
