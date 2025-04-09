@@ -1,43 +1,78 @@
 #include "petri_net.h"
 #include "arc.h"
+#include <cstring>
 
-Place::Place(const std::string& id) : id(id), initialMarking(0), positionX(0), positionY(0) {}
+Place::Place(const char* placeId) {
+    strncpy(id, placeId, MAX_ID_LENGTH - 1);
+    id[MAX_ID_LENGTH - 1] = '\0';
 
-Transition::Transition(const std::string& id) : id(id), positionX(0), positionY(0), 
-    value(0), a(0), b(0), urgent(false), priority(0) {}
-
-Query::Query(const std::string& name) : name(name), active(false) {}
-
-PetriNet::PetriNet(const std::string& id) : id(id), active(false) {}
-
-void PetriNet::addPlace(std::shared_ptr<Place> place) {
-    places[place->id] = place;
+    name[0] = '\0';
+    invariant[0] = '\0';
+    type[0] = '\0';
+    initialMarking = 0;
+    positionX = 0;
+    positionY = 0;
 }
 
-void PetriNet::addTransition(std::shared_ptr<Transition> transition) {
-    transitions[transition->id] = transition;
+Transition::Transition(const char* transId) {
+    strncpy(id, transId, MAX_ID_LENGTH - 1);
+    id[MAX_ID_LENGTH - 1] = '\0';
+
+    name[0] = '\0';
+    distribution[0] = '\0';
+    firingMode[0] = '\0';
+    positionX = 0;
+    positionY = 0;
+    value = 0;
+    a = 0;
+    b = 0;
+    urgent = false;
+    priority = 0;
 }
 
-void PetriNet::addArc(std::shared_ptr<Arc> arc) {
-    arcs.push_back(arc);
+Query::Query(const char* queryName) {
+    strncpy(name, queryName, MAX_NAME_LENGTH - 1);
+    name[MAX_NAME_LENGTH - 1] = '\0';
+
+    type[0] = '\0';
+    formula[0] = '\0';
+    active = false;
 }
 
-void PetriNet::addQuery(std::shared_ptr<Query> query) {
-    queries.push_back(query);
+PetriNet::PetriNet(const char* netId) : arcCount(0), queryCount(0), active(false) {
+    strncpy(id, netId, MAX_ID_LENGTH - 1);
+    id[MAX_ID_LENGTH - 1] = '\0';
+
+    type[0] = '\0';
+    name[0] = '\0';
 }
 
-std::shared_ptr<Place> PetriNet::getPlace(const std::string& id) {
-    auto it = places.find(id);
-    if (it != places.end()) {
-        return it->second;
+void PetriNet::addPlace(const Place& place) {
+    placeMap.insert(place);
+}
+
+void PetriNet::addTransition(const Transition& transition) {
+    transitionMap.insert(transition);
+}
+
+void PetriNet::addArc(const Arc& arc) {
+    if (arcCount < MAX_ARCS) {
+        arcs[arcCount] = arc;
+        arcCount++;
     }
-    return nullptr;
 }
 
-std::shared_ptr<Transition> PetriNet::getTransition(const std::string& id) {
-    auto it = transitions.find(id);
-    if (it != transitions.end()) {
-        return it->second;
+void PetriNet::addQuery(const Query& query) {
+    if (queryCount < MAX_QUERIES) {
+        queries[queryCount] = query;
+        queryCount++;
     }
-    return nullptr;
+}
+
+Place* PetriNet::getPlace(const char* id) {
+    return placeMap.find(id);
+}
+
+Transition* PetriNet::getTransition(const char* id) {
+    return transitionMap.find(id);
 }
