@@ -106,7 +106,7 @@ __global__ void sum(float* array, int numSimulations) {
 	for (int i = 0; i < 1024; i++) {
 		total += array[i];
 	}
-	printf("euler value is %f\n", total / numSimulations);
+	printf("euler value is %.11f\n", (double)total / numSimulations);
 }
 __global__ void summage(float* array, int numSimulations) {
 	int tid = threadIdx.x;
@@ -121,14 +121,13 @@ __global__ void summage(float* array, int numSimulations) {
 
 int main(int argc, char* argv[]) {
 	auto start = std::chrono::high_resolution_clock::now();
-	int gridSize = argc > 1 ? std::stoi(argv[1]) : 1000;
+
+	int gridSize = argc > 1 ? std::stoi(argv[1]) / 1024 < 1 ? 1 : std::stoi(argv[1]) / 1024 : 1000;
 	int blockSize = 1024;
 	int numSimulations = gridSize * blockSize;
 	float* d_results;
 	cudaMalloc((void**)&d_results, numSimulations * sizeof(float));
 	initThread << <gridSize, blockSize >> > (d_results);
-	cudaDeviceSynchronize();
-
 	summage << <1, blockSize >> > (d_results, numSimulations);
 	cudaDeviceSynchronize();
 	sum << <1, 1 >> > (d_results, numSimulations);
