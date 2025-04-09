@@ -1,5 +1,11 @@
 #include "Transition.h"
 
+/**
+ * @brief Checks if a transition is ready to be fired
+ * 
+ * @param result a pointer to a bool to indicate if it is ready
+ * @return bool
+ */
 __device__ void Transition::isReady(bool *result)
 {
     for (size_t i = 0; i < inputArcsCount; i++)
@@ -28,6 +34,14 @@ __device__ void Transition::isReady(bool *result)
     *result = true;
 }
 
+/**
+ * @brief Function for firing a transition
+ * 
+ * @param consumed an array for the consumed tokens
+ * @param consumedCount the maximum length of the consumed array
+ * @param consumedAmout a pointer to tell how many tokens were consumed
+ * @return The filled array and the amount consumed
+ */
 __device__ void Transition::fire(float *consumed, int consumedCount, int *consumedAmout)
 {
     printf("Transition firing \n");
@@ -73,6 +87,12 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
     }
 }
 
+/**
+ * @brief samples distribution function based on the type
+ * 
+ * @param result a pointer to a float to return to
+ * @return float
+ */
 __device__ void Distribution::sample(float *result)
 {
     switch (type)
@@ -82,6 +102,8 @@ __device__ void Distribution::sample(float *result)
         *result = a;
         break;
     case UNIFORM:
+        // a is used for the minimum value created by the uniform distribution
+        // b is used for the maximum value created by the uniform distribution
         float min = a;
         float max = b;
         curandState state;
@@ -90,5 +112,5 @@ __device__ void Distribution::sample(float *result)
         float random = curand_uniform(&state);
         *result = (min + random * (max - min));
         break;
-    }
+    } // more distributions to come
 }

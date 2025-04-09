@@ -93,8 +93,7 @@ __device__ void Place::tokensHold(int amount, float timing[2], bool *returne)
 /**
  * @brief Adds tokens to a place
  *
- * @param place to which the tokens should go
- * @param token to add to the place's tokens
+ * @param token an array of tokens to add to the place's tokens
  *
  * @return nothing
  */
@@ -107,10 +106,9 @@ __device__ void Place::addTokens(float *token)
 }
 
 /**
- * @brief shifts tokens in a place's token array to the left
+ * @brief shifts tokens in a place's token array to the left. works on the array in place.
  *
- * @param place on which the tokens should be shifted
- * @return works on the array in place
+ * @return nothing
  */
 __device__ void Place::shiftTokens()
 {
