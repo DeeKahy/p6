@@ -4,6 +4,7 @@
 #include <string>
 #include "pnml_parser.h"
 
+#include "arc.h"
 void printNetInfo(const std::shared_ptr<PetriNet>& net) {
     std::cout << "Petri Net Information:" << std::endl;
     std::cout << "ID: " << net->id << std::endl;
