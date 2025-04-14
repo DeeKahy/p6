@@ -57,7 +57,7 @@ struct TokenAgeObserver : SimulationObserver
     }
 
     __device__ void onStep(const SimulationEvent *event);
-    __device__ void onCompletion();
+    // __device__ void onCompletion();
     __device__ void getShouldStop(bool *getShouldStop);
 };
 
