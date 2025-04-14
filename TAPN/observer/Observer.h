@@ -1,5 +1,3 @@
-#pragma once
-
 enum SimulationEventType
 {
     TRANSITION_FIRING,
