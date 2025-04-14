@@ -26,7 +26,7 @@ struct Transition
     Distribution distribution;
     float firingTime{0.0f};
     bool urgent;
-    uint id;
+    int id;
     __device__ void fire(float *consumed, int consumedCount, int *consumedAmout);
     __device__ void isReady(bool *result);
 };

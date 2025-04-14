@@ -55,7 +55,7 @@ __device__ void Place::removeTokens(int amount, float *removedTokens)
             if (removedTokens[i] > this->tokens[j])
             {
                 removedTokens[i] = this->tokens[j];
-                this->tokens[j] = MAXFLOAT;
+                this->tokens[j] = FLT_MAX;
                 this->tokenCount--;
                 this->shiftTokens();
             }
@@ -72,13 +72,13 @@ __device__ void Place::removeTokens(int amount, float *removedTokens)
  * @param returne a pointer to a bool for returning the result
  * @return if enough tokens hold the timing
  */
-__device__ void Place::tokensHold(int amount, float timing[2], bool *returne)
+__device__ void Place::tokensHold(int amount, float timing[2], bool* returne)
 {
     printf("Checking tokens\n");
     float minAge = timing[0];
     float maxAge = timing[1];
 
-    int count{0};
+    int count{ 0 };
     for (size_t i = 0; i < this->tokenCount; i++)
     {
         if (this->tokens[i] >= minAge && this->tokens[i] <= maxAge)
@@ -97,10 +97,10 @@ __device__ void Place::tokensHold(int amount, float timing[2], bool *returne)
  *
  * @return nothing
  */
-__device__ void Place::addTokens(float *token)
+__device__ void Place::addTokens(float* token)
 {
     printf("adding tokens \n");
-    printf("token %f \n" ,*token);
+    printf("token %f \n", *token);
     this->tokens[this->tokenCount++] = *token;
     printf("added tokens \n");
 }
@@ -112,12 +112,12 @@ __device__ void Place::addTokens(float *token)
  */
 __device__ void Place::shiftTokens()
 {
-    bool needsToShift{false};
-    int foundAt{0};
+    bool needsToShift{ false };
+    int foundAt{ 0 };
     // Check if the first tokens up to tokenCount are not tokens
     for (size_t i = 0; i < this->tokenCount; i++)
     {
-        if (this->tokens[i] == MAXFLOAT)
+        if (this->tokens[i] == FLT_MAX)
         {
             foundAt = i;
             needsToShift = true;

@@ -11,3 +11,5 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include <curand_kernel.h>
+#include <cfloat>
+#include "../observer/Observer.h"

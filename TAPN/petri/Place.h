@@ -1,7 +1,7 @@
 #pragma once
 #include "Invariant.h"
 #include <string>
-
+#include <cfloat>
 struct Place
 {
     int id;

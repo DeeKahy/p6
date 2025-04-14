@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 3.31)
+project(TAPN LANGUAGES CXX CUDA)
+set(CMAKE_CUDA_ARCHITECTURES 86)  # change depending on your GPU
+
+# Add the executable with .cu files
+add_executable( TAPN    petri/main.cu
+                        petri/Arcs.cu
+                        petri/Invariant.cu
+                        petri/Net.cu
+                        petri/Place.cu
+                        petri/Transition.cu
+                        observer/Observer.cu)  
+
+# Set compilation flags if needed
+set_target_properties(TAPN PROPERTIES
+    CUDA_SEPARABLE_COMPILATION ON
+    CUDA_STANDARD 17
+    CUDA_STANDARD_REQUIRED YES
+)

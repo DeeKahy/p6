@@ -1,10 +1,10 @@
 #include "Net.h"
-// __device__ void Tapn::addObserver(SimulationObserver *observer)
-// {
+ __device__ void Tapn::addObserver(SimulationObserver *observer)
+ {
 
-//     observersCount++;
-//     observers[observersCount - 2] = observer;
-// }
+     //observersCount++;
+     //observers[observersCount - 2] = observer;
+ }
 
 __device__ void Tapn::notify_observers(const SimulationEvent *event)
 {
@@ -55,7 +55,7 @@ __device__ void Tapn::step(bool *result)
         return;
     }
 
-    EnabledTransition lowestFiringTime = {-1, MAXFLOAT};
+    EnabledTransition lowestFiringTime = {-1, FLT_MAX };
     for (size_t i = 0; i < enabledCount; i++)
     {
         int transitionIndex = enabled[i].index;

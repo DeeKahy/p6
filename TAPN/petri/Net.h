@@ -13,7 +13,7 @@ struct Tapn
     int transitionsCount{0};
     SimulationObserver* observers;
     int observersCount{0};
-    uint steps{0};
+    int steps{0};
     float currentTime{0.0f};
     int transitionFirings[20]{0};
 

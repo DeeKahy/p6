@@ -1,70 +1,68 @@
 #include "main.h"
 
 __global__ void euler()
-{;
-    printf("running");
-    Tapn net;
-    Place place1;
-    float token = 0.0f;
-    place1.addTokens(&token);
-    Place place2;
+{
+    // Tapn net;
+    // Place place1;
+    // float token = 0.0f;
+    // place1.addTokens(&token);
+    // Place place2;
 
-    Arc arc1;
-    arc1.place = &place1;
-    arc1.type = TRANSPORT;
-    arc1.timings[0] = 0.0f;
-    arc1.timings[1] = MAXFLOAT;
+    // Arc arc1;
+    // arc1.place = &place1;
+    // arc1.type = TRANSPORT;
+    // arc1.timings[0] = 0.0f;
+    // arc1.timings[1] = FLT_MAX;
 
-    OutputArc oArc1;
-    oArc1.isTransport = true;
-    oArc1.output = &place1;
+    // OutputArc oArc1;
+    // oArc1.isTransport = true;
+    // oArc1.output = &place1;
 
-    Distribution dis1;
-    dis1.type = UNIFORM;
-    dis1.a = 0.0f;
-    dis1.b = 1.0f;
+    // Distribution dis1;
+    // dis1.type = UNIFORM;
+    // dis1.a = 0.0f;
+    // dis1.b = 1.0f;
 
-    Transition trans1;
-    trans1.distribution = dis1;
-    trans1.inputArcs[0] = arc1;
-    trans1.inputArcsCount++;
-    trans1.outputArcs[0] = oArc1;
-    trans1.outputArcsCount++;
+    // Transition trans1;
+    // trans1.distribution = dis1;
+    // trans1.inputArcs[0] = arc1;
+    // trans1.inputArcsCount++;
+    // trans1.outputArcs[0] = oArc1;
+    // trans1.outputArcsCount++;
 
-    Distribution dis2;
-    dis2.type = CONSTANT;
-    dis2.a = 0.0f;
+    // Distribution dis2;
+    // dis2.type = CONSTANT;
+    // dis2.a = 0.0f;
 
-    Arc arc2;
-    arc2.place = &place1;
-    arc2.type = TRANSPORT;
-    arc2.timings[0] = 0.0f;
-    arc2.timings[1] = MAXFLOAT;
+    // Arc arc2;
+    // arc2.place = &place1;
+    // arc2.type = TRANSPORT;
+    // arc2.timings[0] = 0.0f;
+    // arc2.timings[1] = FLT_MAX;
 
-    OutputArc oArc2;
-    oArc2.isTransport = false;
-    oArc2.output = &place2;
+    // OutputArc oArc2;
+    // oArc2.isTransport = false;
+    // oArc2.output = &place2;
 
-    Transition trans2;
-    trans2.distribution = dis2;
-    trans2.inputArcs[0] = arc2;
-    trans2.inputArcsCount++;
-    trans2.outputArcs[0] = oArc2;
-    trans2.outputArcsCount++;
+    // Transition trans2;
+    // trans2.distribution = dis2;
+    // trans2.inputArcs[0] = arc2;
+    // trans2.inputArcsCount++;
+    // trans2.outputArcs[0] = oArc2;
+    // trans2.outputArcsCount++;
 
-    Place places[2]{place1, place2};
+    // Place places[2]{place1, place2};
 
-    net.places = places;
+    // net.places = places;
 
-    net.placesCount = 2;
+    // net.placesCount = 2;
 
-    Transition transitions[2]{trans1, trans2};
-    net.transitions = transitions;
-    net.transitionsCount = 2;
-    // TokenAgeObserver tokenAgeObs(MAXFLOAT);
-    // net.addObserver(&tokenAgeObs);
-    net.run();
-
+    // Transition transitions[2]{trans1, trans2};
+    // net.transitions = transitions;
+    // net.transitionsCount = 2;
+    // // TokenAgeObserver tokenAgeObs(MAXFLOAT);
+    // // net.addObserver(&tokenAgeObs);
+    // net.run();
 }
 
 int main(int argc, char *argv[])
@@ -89,7 +87,8 @@ int main(int argc, char *argv[])
     int executionCount = ceil(number / threads);
     std::cout << "number of executions: " << executionCount << std::endl;
     std::cout << "number of executions: " << executionCount * threads << std::endl;
-    euler<<<1, 1024>>>();
+    // euler<<<executionCount, threads>>>();
+    cudaDeviceSynchronize();
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "time run: " << duration.count() << std::endl;

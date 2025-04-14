@@ -1,3 +1,6 @@
+#pragma once
+
+
 enum SimulationEventType
 {
     TRANSITION_FIRING,
@@ -88,7 +91,7 @@ struct TokenCountObserver : SimulationObserver
         numThresholds = 0;
     }
 
-    __device__ void add_threshold(int place_id, unsigned threshold, Comparison comp);
+    /*__device__ void add_threshold(int place_id, unsigned threshold, Comparison comp);*/
     __device__ void checkCondition(unsigned count, unsigned threshold, Comparison comp, bool *result);
     __device__ void onStep(const SimulationEvent *event);
     __device__ void getShouldStop(bool *getShouldStop);
