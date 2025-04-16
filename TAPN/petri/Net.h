@@ -7,11 +7,11 @@
 
 struct Tapn
 {
-    Place *places;
+    Place **places;
     int placesCount{0};
-    Transition *transitions;
+    Transition **transitions;
     int transitionsCount{0};
-    SimulationObserver* observers;
+    SimulationObserver** observers;
     int observersCount{0};
     int steps{0};
     float currentTime{0.0f};

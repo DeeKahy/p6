@@ -9,18 +9,19 @@
  */
 __device__ void Arc::fire(float *outputTokens, int *outputCount)
 {
+    printf("%d",type);
     switch (type)
     {
     case INPUT:
-        printf("Input firing \n");
+        // printf("Input firing \n");
         inputFire(outputTokens, outputCount);
         break;
     case TRANSPORT:
-        printf("Transport firing \n");
+        // printf("Transport firing \n");
         transportFire(outputTokens, outputCount);
         break;
     case INHIBITOR:
-        printf("Inhibitor firing \n");
+        // printf("Inhibitor firing \n");
         inhibitorFire(outputTokens, outputCount);
         break;
     }
@@ -36,14 +37,13 @@ __device__ void Arc::canFire(bool *result)
 {
     bool tokensOk;
     bool invariantsOk;
-
     switch (type)
     {
     case INPUT:
         place->tokensHold(weight, timings, &tokensOk);
         place->invariantHold(weight, &invariantsOk);
-        printf("tokesOk %d \n",tokensOk);
-        printf("invariantsOk %d \n",invariantsOk);
+        // printf("tokesOk %d \n",tokensOk);
+        // printf("invariantsOk %d \n",invariantsOk);
         *result = tokensOk && invariantsOk;
         break;
     case TRANSPORT:
@@ -56,7 +56,10 @@ __device__ void Arc::canFire(bool *result)
         place->invariantHold(weight, &invariantsOk);
         *result = tokensOk && invariantsOk;
         break;
+        default:
+        printf("test");
     }
+
 }
 
 /**
@@ -75,6 +78,7 @@ __device__ void Arc::transportFire(float *outputTokens, int *outputCount)
     {
         bool removeSuccess = false;
         place->removeTokens(weight, outputTokens);
+        
         *outputCount = removeSuccess ? weight : 0;
     }
     else
@@ -95,7 +99,7 @@ __device__ void Arc::inputFire(float *outputTokens, int *outputCount)
     bool canFireResult = false;
     canFire(&canFireResult);
 
-    printf("Input can fire \n");
+    // printf("Input can fire \n");
     if (canFireResult)
     {
         for (size_t i = 0; i < weight; i++)
@@ -107,18 +111,19 @@ __device__ void Arc::inputFire(float *outputTokens, int *outputCount)
         float *dummy = new float[weight]{FLT_MAX};
         bool removeSuccess = false;
 
-        printf("Trying to remove\n");
+        // printf("Trying to remove\n");
         place->removeTokens(weight, dummy);
         if (!removeSuccess)
         {
             *outputCount = 0;
         }
+        delete[]dummy;
     }
     else
     {
         *outputCount = 0;
     }
-    printf("Input firing success\n");
+    // printf("Input firing success\n");
 }
 
 /**
@@ -160,14 +165,10 @@ __device__ void OutputArc::fire(float *tokens, int tokenCount, bool *success)
     }
     else
     {
-        printf("Output firing \n");
-        float *newTokens = new float[weight];
-        for (size_t i = 0; i < weight; i++)
-        {
-            newTokens[i] = 0.0f;
-        }
+        // printf("Output firing \n");
+        float newToken = 0.0f;
         bool addSuccess = false;
-        output->addTokens(newTokens /* , weight, &addSuccess */);
+        output->addTokens(&newToken /* , weight, &addSuccess */);
         *success = addSuccess;
     }
 }

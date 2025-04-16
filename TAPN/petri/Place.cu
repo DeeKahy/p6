@@ -20,7 +20,7 @@ __device__ void Place::invariantHold(int tokenCount, bool *returne)
         *returne = true;
         return;
     }
-    printf("not a nullptr\n");
+    // printf("not a nullptr\n");
     
     int count{0};
     for (size_t i = 0; i < this->tokenCount; i++)
@@ -46,8 +46,8 @@ __device__ void Place::invariantHold(int tokenCount, bool *returne)
  */
 __device__ void Place::removeTokens(int amount, float *removedTokens)
 {
-    printf("Removing tokens!!!\n");
-    printf("amount %d", amount);
+    // printf("Removing tokens!!!\n");
+    // printf("amount %d", amount);
     for (size_t i = 0; i < amount; i++)
     {
         for (size_t j = 0; j < this->tokenCount; j++)
@@ -74,7 +74,7 @@ __device__ void Place::removeTokens(int amount, float *removedTokens)
  */
 __device__ void Place::tokensHold(int amount, float timing[2], bool* returne)
 {
-    printf("Checking tokens\n");
+    // printf("Checking tokens\n");
     float minAge = timing[0];
     float maxAge = timing[1];
 
@@ -86,7 +86,7 @@ __device__ void Place::tokensHold(int amount, float timing[2], bool* returne)
             count++;
         }
     }
-    printf("done checking tokens\n");
+    // printf("done checking tokens\n");
     *returne = count >= amount;
 }
 
@@ -99,10 +99,10 @@ __device__ void Place::tokensHold(int amount, float timing[2], bool* returne)
  */
 __device__ void Place::addTokens(float* token)
 {
-    printf("adding tokens \n");
-    printf("token %f \n", *token);
+    // printf("adding tokens \n");
+    // printf("token %f \n", *token);
     this->tokens[this->tokenCount++] = *token;
-    printf("added tokens \n");
+    // printf("added tokens \n");
 }
 
 /**

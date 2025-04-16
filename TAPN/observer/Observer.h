@@ -42,7 +42,7 @@ struct SimulationObserver
     bool shouldStop{false};
 
     __device__ virtual void onStep(const SimulationEvent *event) = 0;
-    __device__ virtual void onCompletion() = 0;
+    // __device__ virtual void onCompletion() = 0;
     __device__ virtual void getShouldStop(bool *getShouldStop) = 0;
 };
 

@@ -1,41 +1,45 @@
 #include "Net.h"
- __device__ void Tapn::addObserver(SimulationObserver *observer)
- {
+__device__ void Tapn::addObserver(SimulationObserver *observer)
+{
 
-     //observersCount++;
-     //observers[observersCount - 2] = observer;
- }
+    cudaMalloc((void **)&observers, sizeof(*observers) + sizeof(*observer));
+    observers[observersCount] = observer;
+    observersCount++;
+}
 
 __device__ void Tapn::notify_observers(const SimulationEvent *event)
 {
     for (size_t i = 0; i < observersCount; i++)
     {
-        observers[i].onStep(event);
+        observers[i]->onStep(event);
     }
+    
 }
 
 __device__ void Tapn::step(bool *result)
 {
     updateEnabledTransitions();
 
-    EnabledTransition* enabled = new EnabledTransition[transitionsCount];
+    EnabledTransition *enabled = new EnabledTransition[transitionsCount];
     int enabledCount = 0;
 
     for (int i = 0; i < transitionsCount; i++)
     {
-        bool isReady = false;
-        transitions[i].isReady(&isReady);
+        bool isReady = true;
+        transitions[i]->isReady(&isReady);
         if (isReady)
         {
-            enabled[enabledCount] = {i, transitions[i].firingTime};
+            enabled[enabledCount] = {i, transitions[i]->firingTime};
             enabledCount++;
         }
     }
+    printf("%d\n", enabledCount);
 
     // No enabled transitions
     if (enabledCount == 0)
     {
         *result = false;
+        delete[] enabled;
         return;
     }
 
@@ -43,7 +47,7 @@ __device__ void Tapn::step(bool *result)
     for (size_t i = 0; i < enabledCount; i++)
     {
         int transitionIndex = enabled[i].index;
-        if (transitions[transitionIndex].urgent)
+        if (transitions[transitionIndex]->urgent)
         {
             urgentTransitionIndex = i;
         }
@@ -52,14 +56,15 @@ __device__ void Tapn::step(bool *result)
     if (urgentTransitionIndex != -1)
     {
         fireTransition(urgentTransitionIndex, result);
+        delete[] enabled;
         return;
     }
 
-    EnabledTransition lowestFiringTime = {-1, FLT_MAX };
+    EnabledTransition lowestFiringTime = {-1, FLT_MAX};
     for (size_t i = 0; i < enabledCount; i++)
     {
         int transitionIndex = enabled[i].index;
-        if (transitions[transitionIndex].firingTime < lowestFiringTime.firingTime)
+        if (transitions[transitionIndex]->firingTime < lowestFiringTime.firingTime)
         {
             lowestFiringTime = enabled[i];
         }
@@ -69,11 +74,12 @@ __device__ void Tapn::step(bool *result)
     // delay();
     bool success = false;
     fireTransition(lowestFiringTime.index, &success);
+    delete[] enabled;
 }
 
 __device__ void Tapn::fireTransition(size_t index, bool *result)
 {
-    float firingTime = transitions[index].firingTime;
+    float firingTime = transitions[index]->firingTime;
 
     SimulationEvent event;
     event.type = TRANSITION_FIRING;
@@ -86,11 +92,11 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     float consumed[10];
     int consumedCount{10};
     int consumedAmount;
-    transitions[index].fire(consumed, consumedCount, &consumedAmount);
+    transitions[index]->fire(consumed, consumedCount, &consumedAmount);
 
     transitionFirings[index]++;
     steps++;
-
+    // printf("%d",steps);
     // more observer stuff here
 
     *result = true;
@@ -112,9 +118,17 @@ __device__ void Tapn::run()
 {
     bool result;
     shouldContinue(&result);
-    while (!result)
+    // for (size_t i = 0; i < count; i++)
+    // {
+    //     /* code */
+    // }
+    // for (size_t i = 0; i < 5; i++)
+    // {
+    //     step(&result);
+    // }
+    
+    while (result)
     {
-        bool result;
         step(&result);
     }
     // for (size_t i = 0; i < observersCount; i++)
@@ -127,12 +141,13 @@ __device__ void Tapn::shouldContinue(bool *result)
 {
     for (size_t i = 0; i < observersCount; i++)
     {
-        observers[i].getShouldStop(result);
+        observers[i]->getShouldStop(result);
         if (*result)
         {
             return;
         }
     }
+    *result = true;
 }
 
 __device__ void Tapn::delay()
@@ -148,9 +163,9 @@ __device__ void Tapn::updateTokenAges(float *delay)
     currentTime += *delay;
     for (size_t i = 0; i < placesCount; i++)
     {
-        for (size_t j = 0; j < places[i].tokenCount; j++)
+        for (size_t j = 0; j < places[i]->tokenCount; j++)
         {
-            places[i].tokens[j] += *delay;
+            places[i]->tokens[j] += *delay;
         }
     }
 }
@@ -160,6 +175,6 @@ __device__ void Tapn::updateEnabledTransitions()
     for (size_t i = 0; i < transitionsCount; i++)
     {
         bool ready;
-        transitions[i].isReady(&ready);
+        transitions[i]->isReady(&ready);
     }
 }
