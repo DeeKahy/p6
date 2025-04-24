@@ -1,11 +1,12 @@
 #include "main.h"
 
-__global__ void euler()
+__global__ void euler(float* results)
 {
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
     Tapn net;
     Place place1;
     float token = 0.0f;
-    place1.addTokens(&token);
+    place1.addTokens(&token,1);
     Place place2;
 
     Arc arc1;
@@ -64,10 +65,32 @@ __global__ void euler()
     // net.addObserver(&tokenAgeObs);
     // TokenCountObserver tokenCountObs;
     // net.addObserver(&tokenCountObs);
+    bool test;
     net.run();
-    printf("\n%d\n", net.steps);
-}
+    results[tid] = net.steps-1;
+    // net.step(&test);
+    // //printf("\n place 0 %f\n", place1.tokens[0]);
+    // net.step(&test);
+    // net.step(&test);
 
+}
+__global__ void sum(float* array, int numSimulations) {
+	float total = 0.0f;
+	for (int i = 0; i < 1024; i++) {
+		total += array[i];
+	}
+	printf("euler value is %.11f\n", (double)total / numSimulations);
+}
+__global__ void summage(float* array, int numSimulations) {
+	int tid = threadIdx.x;
+	float sum = 0.0f;
+
+	for (int i = 0; i < numSimulations / 1024; i++) {
+		sum += array[tid + i * 1024];
+	}
+
+	array[tid] = sum;
+}
 int main(int argc, char *argv[])
 {
     auto start = std::chrono::high_resolution_clock::now();
@@ -90,19 +113,24 @@ int main(int argc, char *argv[])
     int executionCount = ceil(number / threads);
     std::cout << "number of executions: " << executionCount << std::endl;
     std::cout << "number of executions: " << executionCount * threads << std::endl;
-    euler<<<1, 1>>>();
+    float* d_results;
+    cudaMalloc((void**)&d_results, executionCount * threads * sizeof(float));
+    euler<<<executionCount, threads>>>(d_results);
     cudaDeviceSynchronize();
-
+	summage << <1, threads >> > (d_results, executionCount * threads);
+	cudaDeviceSynchronize();
+	sum << <1, 1 >> > (d_results, executionCount * threads);
+	cudaDeviceSynchronize();
     cudaError_t errSync = cudaDeviceSynchronize();
     cudaError_t errAsync = cudaGetLastError();
 
     if (errSync != cudaSuccess)
     {
-        printf("Sync error: %s\n", cudaGetErrorString(errSync));
+        //printf("Sync error: %s\n", cudaGetErrorString(errSync));
     }
     if (errAsync != cudaSuccess)
     {
-        printf("Launch error: %s\n", cudaGetErrorString(errAsync));
+        //printf("Launch error: %s\n", cudaGetErrorString(errAsync));
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);

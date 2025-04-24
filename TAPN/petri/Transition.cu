@@ -8,7 +8,7 @@
  */
 __device__ void Transition::isReady(bool *result)
 {
-    // printf("%d",inputArcsCount);
+    // //printf("%d",inputArcsCount);
     for (size_t i = 0; i < inputArcsCount; i++)
     {
         
@@ -25,7 +25,7 @@ __device__ void Transition::isReady(bool *result)
 
     if (!urgent)
     {
-        // printf("got here");
+        // //printf("got here");
         float test;
         distribution->sample(&test);
         firingTime = test;
@@ -48,7 +48,7 @@ __device__ void Transition::isReady(bool *result)
  */
 __device__ void Transition::fire(float *consumed, int consumedCount, int *consumedAmout)
 {
-    // printf("Transition firing \n");
+    // //printf("Transition firing \n");
     for (size_t i = 0; i < inputArcsCount; i++)
     {
         switch (inputArcs[i]->type)
@@ -64,30 +64,30 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
             inputArcs[i]->fire(consumed, consumedAmout);
             break;
         default:
-            // printf("could not find type");
+            // //printf("could not find type");
             break;
         }
     }
 
     if (outputArcsCount == 0)
     {
-        // printf("No output arcs \n");
+        // //printf("No output arcs \n");
         return;
     }
 
     for (size_t i = 0; i < outputArcsCount; i++)
     {
         bool success;
-        // printf("Firing outputs \n");
+        // //printf("Firing outputs \n");
         if (outputArcs[i]->isTransport)
         {
-            outputArcs[i]->fire(consumed, consumedCount, &success);
+            outputArcs[i]->fire(consumed, *consumedAmout, &success);
         }
         else
         {
-            outputArcs[i]->fire(consumed, consumedCount, &success);
+            outputArcs[i]->fire(consumed, *consumedAmout, &success);
         }
-        // printf("Firing outputs \n");
+        // //printf("Firing outputs \n");
     }
 }
 
@@ -99,6 +99,7 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
  */
 __device__ void Distribution::sample(float *result)
 {
+
     switch (type)
     {
     case CONSTANT:
@@ -117,4 +118,5 @@ __device__ void Distribution::sample(float *result)
         *result = (min + random * (max - min));
         break;
     } // more distributions to come
+
 }

@@ -33,7 +33,7 @@ __device__ void Tapn::step(bool *result)
             enabledCount++;
         }
     }
-    printf("%d\n", enabledCount);
+    // //printf("%d\n", enabledCount);
 
     // No enabled transitions
     if (enabledCount == 0)
@@ -89,14 +89,14 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
 
     updateTokenAges(&firingTime);
 
-    float consumed[10];
-    int consumedCount{10};
+    float consumed[8]{FLT_MAX};
+    int consumedCount{8};
     int consumedAmount;
     transitions[index]->fire(consumed, consumedCount, &consumedAmount);
 
     transitionFirings[index]++;
     steps++;
-    // printf("%d",steps);
+    // //printf("%d",steps);
     // more observer stuff here
 
     *result = true;
@@ -156,6 +156,7 @@ __device__ void Tapn::delay()
 
 __device__ void Tapn::updateTokenAges(float *delay)
 {
+
     if (*delay <= 0.0f)
     {
         return;
@@ -165,7 +166,9 @@ __device__ void Tapn::updateTokenAges(float *delay)
     {
         for (size_t j = 0; j < places[i]->tokenCount; j++)
         {
+            //printf("\ntoken before%f\n",places[i]->tokens[j]);
             places[i]->tokens[j] += *delay;
+            //printf("\ntoken after%f\n",places[i]->tokens[j]);
         }
     }
 }
