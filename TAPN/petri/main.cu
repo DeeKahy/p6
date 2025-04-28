@@ -134,6 +134,7 @@ int main(int argc, char *argv[])
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    cudaFree(d_results);
     std::cout << "time run: " << duration.count() << std::endl;
     return 0;
 }

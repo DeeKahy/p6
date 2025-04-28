@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.31)
 project(TAPN LANGUAGES CXX CUDA)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_CUDA_ARCHITECTURES 86)  # change depending on your GPU
 
 # Add the executable with .cu files
