@@ -64,7 +64,7 @@ __global__ void simulate_spn(SPN *SPN, int steps)
     // Ensure next_transition is valid
     if (!next_transition)
     {
-        // printf("No transition is ready.\n");
+        // //printf("No transition is ready.\n");
         return;
     }
 
@@ -81,7 +81,7 @@ __global__ void simulate_spn(SPN *SPN, int steps)
         SPN->places[index] += 1;
     }
 
-    printf("Fired transition with firing time: %f\n", next_transition->firing_time);
+    //printf("Fired transition with firing time: %f\n", next_transition->firing_time);
     next_transition->firing_time = 0;
     next_transition->ready = false;
 }

@@ -1,6 +1,15 @@
 #pragma once
 #include "Place.h"
 #include "Arcs.h"
-#include "Invariants.h"
+#include "Invariant.h"
 #include "Transition.h"
+#include "Net.h"
+#include <string>
 #include <iostream>
+#include <cmath>
+#include <chrono>
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+#include <curand_kernel.h>
+#include <cfloat>
+#include "../observer/Observer.h"

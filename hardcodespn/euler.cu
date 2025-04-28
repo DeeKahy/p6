@@ -106,7 +106,7 @@ __global__ void sum(float* array, int numSimulations) {
 	for (int i = 0; i < 1024; i++) {
 		total += array[i];
 	}
-	printf("euler value is %.11f\n", (double)total / numSimulations);
+	//printf("euler value is %.11f\n", (double)total / numSimulations);
 }
 __global__ void summage(float* array, int numSimulations) {
 	int tid = threadIdx.x;

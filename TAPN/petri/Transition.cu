@@ -8,11 +8,14 @@
  */
 __device__ void Transition::isReady(bool *result)
 {
+    // //printf("%d",inputArcsCount);
     for (size_t i = 0; i < inputArcsCount; i++)
     {
+        
         // Check if transition can fire
         bool transitionCanFire = false;
-        inputArcs[i].canFire(&transitionCanFire);
+        inputArcs[i]->canFire(&transitionCanFire);
+
         if (!transitionCanFire)
         {
             *result = false;
@@ -22,9 +25,10 @@ __device__ void Transition::isReady(bool *result)
 
     if (!urgent)
     {
-        float result;
-        distribution.sample(&result);
-        firingTime = result;
+        // //printf("got here");
+        float test;
+        distribution->sample(&test);
+        firingTime = test;
     }
     else
     {
@@ -44,46 +48,46 @@ __device__ void Transition::isReady(bool *result)
  */
 __device__ void Transition::fire(float *consumed, int consumedCount, int *consumedAmout)
 {
-    printf("Transition firing \n");
+    // //printf("Transition firing \n");
     for (size_t i = 0; i < inputArcsCount; i++)
     {
-        switch (inputArcs[i].type)
+        switch (inputArcs[i]->type)
         {
         case INPUT:
-            inputArcs[i].fire(consumed, consumedAmout);
+            inputArcs[i]->fire(consumed, consumedAmout);
             break;
         case TRANSPORT:
-            inputArcs[i].fire(consumed, consumedAmout);
+            inputArcs[i]->fire(consumed, consumedAmout);
             break;
         case INHIBITOR:
             // Inhibitor arcs don't consume tokens
-            inputArcs[i].fire(consumed, consumedAmout);
+            inputArcs[i]->fire(consumed, consumedAmout);
             break;
         default:
-            printf("could not find type");
+            // //printf("could not find type");
             break;
         }
     }
 
     if (outputArcsCount == 0)
     {
-        printf("No output arcs \n");
+        // //printf("No output arcs \n");
         return;
     }
 
     for (size_t i = 0; i < outputArcsCount; i++)
     {
         bool success;
-        printf("Firing outputs \n");
-        if (outputArcs[i].isTransport)
+        // //printf("Firing outputs \n");
+        if (outputArcs[i]->isTransport)
         {
-            outputArcs[i].fire(consumed, consumedCount, &success);
+            outputArcs[i]->fire(consumed, *consumedAmout, &success);
         }
         else
         {
-            outputArcs[i].fire(consumed, consumedCount, &success);
+            outputArcs[i]->fire(consumed, *consumedAmout, &success);
         }
-        printf("Firing outputs \n");
+        // //printf("Firing outputs \n");
     }
 }
 
@@ -95,6 +99,7 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
  */
 __device__ void Distribution::sample(float *result)
 {
+
     switch (type)
     {
     case CONSTANT:
@@ -113,4 +118,5 @@ __device__ void Distribution::sample(float *result)
         *result = (min + random * (max - min));
         break;
     } // more distributions to come
+
 }

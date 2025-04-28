@@ -19,14 +19,14 @@ struct Distribution
 
 struct Transition
 {
-    Arc inputArcs[5];
-    int inputArcsCount;
-    OutputArc outputArcs[5];
-    int outputArcsCount;
-    Distribution distribution;
+    Arc* inputArcs[5];
+    int inputArcsCount{0};
+    OutputArc* outputArcs[5];
+    int outputArcsCount{0};
+    Distribution* distribution;
     float firingTime{0.0f};
     bool urgent;
-    uint id;
+    int id;
     __device__ void fire(float *consumed, int consumedCount, int *consumedAmout);
     __device__ void isReady(bool *result);
 };

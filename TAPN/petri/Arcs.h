@@ -12,7 +12,7 @@ struct Arc
 {
     ArcType type;
     Place *place;
-    size_t weight;
+    size_t weight{1};
     float timings[2];
     size_t constraint;
 
@@ -26,7 +26,7 @@ struct Arc
 struct OutputArc
 {
     Place *output;
-    size_t weight;
+    size_t weight{1};
     bool isTransport;
 
     __device__ void fire(float *tokens, int tokenCount, bool *success);
