@@ -7,7 +7,7 @@ endif()
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_CUDA_ARCHITECTURES 86)  # change depending on your GPU
+set(CMAKE_CUDA_ARCHITECTURES 61 75 86 89)  # change depending on your GPU
 
 # Add the executable with .cu files
 add_executable( TAPN    petri/main.cu

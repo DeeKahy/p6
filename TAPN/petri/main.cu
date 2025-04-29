@@ -76,7 +76,7 @@ __global__ void euler(float* results)
 }
 __global__ void sum(float* array, int numSimulations) {
 	float total = 0.0f;
-	for (int i = 0; i < 1024; i++) {
+	for (int i = 0; i < 512; i++) {
 		total += array[i];
 	}
 	printf("euler value is %.11f\n", (double)total / numSimulations);
@@ -85,8 +85,8 @@ __global__ void summage(float* array, int numSimulations) {
 	int tid = threadIdx.x;
 	float sum = 0.0f;
 
-	for (int i = 0; i < numSimulations / 1024; i++) {
-		sum += array[tid + i * 1024];
+	for (int i = 0; i < numSimulations / 512; i++) {
+		sum += array[tid + i * 512];
 	}
 
 	array[tid] = sum;
@@ -96,11 +96,11 @@ int main(int argc, char *argv[])
     auto start = std::chrono::high_resolution_clock::now();
     float confidence;
     float error;
-    int threads = 1024;
+    int threads = 512;
     if (argc < 3)
     {
         confidence = 0.95f;
-        error = 0.005f;
+        error = 0.0008f;
     }
     else
     {
