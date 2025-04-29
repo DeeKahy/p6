@@ -2,7 +2,7 @@
 
 /**
  * @brief Checks if a transition is ready to be fired
- * 
+ *
  * @param result a pointer to a bool to indicate if it is ready
  * @return bool
  */
@@ -11,7 +11,7 @@ __device__ void Transition::isReady(bool *result)
     // //printf("%d",inputArcsCount);
     for (size_t i = 0; i < inputArcsCount; i++)
     {
-        
+
         // Check if transition can fire
         bool transitionCanFire = false;
         inputArcs[i]->canFire(&transitionCanFire);
@@ -40,7 +40,7 @@ __device__ void Transition::isReady(bool *result)
 
 /**
  * @brief Function for firing a transition
- * 
+ *
  * @param consumed an array for the consumed tokens
  * @param consumedCount the maximum length of the consumed array
  * @param consumedAmout a pointer to tell how many tokens were consumed
@@ -93,7 +93,7 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
 
 /**
  * @brief samples distribution function based on the type
- * 
+ *
  * @param result a pointer to a float to return to
  * @return float
  */
@@ -111,12 +111,21 @@ __device__ void Distribution::sample(float *result)
         // b is used for the maximum value created by the uniform distribution
         float min = a;
         float max = b;
-        curandState state;
-        int tid = blockIdx.x * blockDim.x + threadIdx.x;
-        curand_init(clock64() + tid, tid, 0, &state);
         float random = curand_uniform(&state);
         *result = (min + random * (max - min));
         break;
+    case NORMAL:
+        // a is used for the for the mean by the normal distribution
+        // b is used for the maximum value created by the uniform distribution
+        float mean = a;
+        float dev = b;
+        float random = curand_normal(&state);
+        *result = mean + dev * random;
+        break;
     } // more distributions to come
-
+}
+__device__ void Distribution::init()
+{
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    curand_init(clock64() + tid, tid, 0, &state);
 }
