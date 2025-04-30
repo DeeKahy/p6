@@ -66,7 +66,6 @@ __global__ void euler(float *results)
     // net.addObserver(&tokenAgeObs);
     // TokenCountObserver tokenCountObs;
     // net.addObserver(&tokenCountObs);
-    bool test;
     net.run();
     results[tid] = net.steps - 1;
     // net.step(&test);

@@ -109,18 +109,12 @@ __device__ void Distribution::sample(float *result)
     case UNIFORM:
         // a is used for the minimum value created by the uniform distribution
         // b is used for the maximum value created by the uniform distribution
-        float min = a;
-        float max = b;
-        float random = curand_uniform(&state);
-        *result = (min + random * (max - min));
+        *result = (a + curand_uniform(&state) * (b - a));
         break;
     case NORMAL:
         // a is used for the for the mean by the normal distribution
         // b is used for the maximum value created by the uniform distribution
-        float mean = a;
-        float dev = b;
-        float random = curand_normal(&state);
-        *result = mean + dev * random;
+        *result = a + b * curand_normal(&state);;
         break;
     } // more distributions to come
 }
