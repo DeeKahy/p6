@@ -67,13 +67,12 @@ __global__ void euler(float *results)
     // TokenCountObserver tokenCountObs;
     // net.addObserver(&tokenCountObs);
     net.run();
-    results[tid] = net.steps - 1;
+    results[tid] += net.steps - 1;
     // net.step(&test);
     // //printf("\n place 0 %f\n", place1.tokens[0]);
     // net.step(&test);
     // net.step(&test);
 }
-
 
 __global__ void sum(float *array, int numSimulations)
 {
@@ -102,6 +101,7 @@ int main(int argc, char *argv[])
     float confidence;
     float error;
     int threads = 512;
+    int blockCount = 2048;
     if (argc < 3)
     {
         confidence = 0.95f;
@@ -116,15 +116,22 @@ int main(int argc, char *argv[])
     float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
     std::cout << "number of executions: " << number << std::endl;
     int executionCount = ceil(number / threads);
+    int loopCount = ceil(executionCount / blockCount);
     std::cout << "number of executions: " << executionCount << std::endl;
-    std::cout << "number of executions: " << executionCount * threads << std::endl;
+    std::cout << "number of executions: " << loopCount * blockCount * threads << std::endl;
     float *d_results;
-    cudaMalloc((void **)&d_results, executionCount * threads * sizeof(float));
-    euler<<<executionCount, threads>>>(d_results);
+
+    cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float));
+    cudaMemset((void **)&d_results, 0, blockCount * threads * sizeof(float));
+    for (size_t i = 0; i < loopCount; i++)
+    {
+        euler<<<blockCount, threads>>>(d_results);
+        cudaDeviceSynchronize();
+    }
+
+    summage<<<1, threads>>>(d_results, blockCount * threads);
     cudaDeviceSynchronize();
-    summage<<<1, threads>>>(d_results, executionCount * threads);
-    cudaDeviceSynchronize();
-    sum<<<1, 1>>>(d_results, executionCount * threads);
+    sum<<<1, 1>>>(d_results, loopCount * blockCount * threads);
     cudaDeviceSynchronize();
     cudaError_t errSync = cudaDeviceSynchronize();
     cudaError_t errAsync = cudaGetLastError();
@@ -137,9 +144,9 @@ int main(int argc, char *argv[])
     {
         // printf("Launch error: %s\n", cudaGetErrorString(errAsync));
     }
+    cudaFree(d_results);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    cudaFree(d_results);
     std::cout << "time run: " << duration.count() << std::endl;
     return 0;
 }
