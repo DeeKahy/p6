@@ -7,6 +7,7 @@ enum DistributionTypes
     CONSTANT,
     UNIFORM,
     NORMAL,
+    EXPONENTIAL,
 };
 
 struct Distribution

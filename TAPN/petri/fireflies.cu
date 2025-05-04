@@ -41,14 +41,11 @@ __global__ void fireflies(float *results)
     arrive3.timings[0] = 0.0f;
     arrive3.timings[1] = FLT_MAX;
 
-
-
     Place charging0;
     Place charging1;
     Place charging2;
     Place charging3;
-    Place chargedSum;
-    
+
     OutputArc oArrive0;
     oArrive0.isTransport = false;
     oArrive0.output = &charging0;
@@ -118,6 +115,7 @@ __global__ void fireflies(float *results)
     Place charged1;
     Place charged2;
     Place charged3;
+    Place chargedSum;
 
     OutputArc oReady0;
     oReady0.isTransport = false;
@@ -132,32 +130,314 @@ __global__ void fireflies(float *results)
     oReady3.isTransport = false;
     oReady3.output = &charged3;
 
+    OutputArc oChargedSum;
+    oChargedSum.isTransport = false;
+    oChargedSum.output = &chargedSum;
+
     Transition aReady0;
     aReady0.distribution = &dis2;
     aReady0.inputArcs[0] = &ready0;
     aReady0.inputArcsCount++;
     aReady0.outputArcs[0] = &oReady0;
     aReady0.outputArcsCount++;
+    aReady0.outputArcs[1] = &oChargedSum;
+    aReady0.outputArcsCount++;
+
     Transition aReady1;
     aReady1.distribution = &dis2;
     aReady1.inputArcs[0] = &ready1;
     aReady1.inputArcsCount++;
     aReady1.outputArcs[0] = &oReady1;
     aReady1.outputArcsCount++;
+    aReady1.outputArcs[1] = &oChargedSum;
+    aReady1.outputArcsCount++;
+
     Transition aReady2;
     aReady2.distribution = &dis2;
     aReady2.inputArcs[0] = &ready2;
     aReady2.inputArcsCount++;
     aReady2.outputArcs[0] = &oReady2;
     aReady2.outputArcsCount++;
+    aReady2.outputArcs[1] = &oChargedSum;
+    aReady2.outputArcsCount++;
+
     Transition aReady3;
     aReady3.distribution = &dis2;
     aReady3.inputArcs[0] = &ready3;
     aReady3.inputArcsCount++;
     aReady3.outputArcs[0] = &oReady3;
     aReady3.outputArcsCount++;
-
-    
-
+    aReady3.outputArcs[1] = &oChargedSum;
+    aReady3.outputArcsCount++;
     Place flashing;
+    Arc aChargedSum;
+    aChargedSum.place = &chargedSum;
+    aChargedSum.type = INPUT;
+    aChargedSum.timings[0] = 0.0f;
+    aChargedSum.timings[1] = FLT_MAX;
+
+    Arc flashAlone0;
+    flashAlone0.place = &flashing;
+    flashAlone0.type = INHIBITOR;
+    flashAlone0.constraint = 1;
+    flashAlone0.timings[0] = 0.0f;
+    flashAlone0.timings[1] = FLT_MAX;
+    Arc flashAlone1;
+    flashAlone1.place = &flashing;
+    flashAlone1.type = INHIBITOR;
+    flashAlone1.constraint = 1;
+    flashAlone1.timings[0] = 0.0f;
+    flashAlone1.timings[1] = FLT_MAX;
+    Arc flashAlone2;
+    flashAlone2.place = &flashing;
+    flashAlone2.type = INHIBITOR;
+    flashAlone2.constraint = 1;
+    flashAlone2.timings[0] = 0.0f;
+    flashAlone2.timings[1] = FLT_MAX;
+    Arc flashAlone3;
+    flashAlone3.place = &flashing;
+    flashAlone3.type = INHIBITOR;
+    flashAlone3.constraint = 1;
+    flashAlone3.timings[0] = 0.0f;
+    flashAlone3.timings[1] = FLT_MAX;
+
+    Arc flashAlone01;
+    flashAlone0.place = &charged0;
+    flashAlone0.type = INPUT;
+    flashAlone0.timings[0] = 0.0f;
+    flashAlone0.timings[1] = FLT_MAX;
+    Arc flashAlone11;
+    flashAlone1.place = &charged1;
+    flashAlone1.type = INPUT;
+    flashAlone1.timings[0] = 0.0f;
+    flashAlone1.timings[1] = FLT_MAX;
+    Arc flashAlone21;
+    flashAlone2.place = &charged2;
+    flashAlone2.type = INPUT;
+    flashAlone2.timings[0] = 0.0f;
+    flashAlone2.timings[1] = FLT_MAX;
+    Arc flashAlone31;
+    flashAlone3.place = &charged3;
+    flashAlone3.type = INPUT;
+    flashAlone3.timings[0] = 0.0f;
+    flashAlone3.timings[1] = FLT_MAX;
+
+    OutputArc oFlashing;
+    oReady0.isTransport = false;
+    oReady0.output = &flashing;
+
+    Distribution dis3;
+    dis2.type = EXPONENTIAL;
+    dis2.a = 0.5f;
+
+    Transition aFlashing0;
+    aFlashing0.distribution = &dis3;
+    aFlashing0.inputArcs[0] = &flashAlone0;
+    aFlashing0.inputArcsCount++;
+    aFlashing0.inputArcs[1] = &flashAlone01;
+    aFlashing0.inputArcsCount++;
+    aFlashing0.inputArcs[2] = &aChargedSum;
+    aFlashing0.inputArcsCount++;
+    aFlashing0.outputArcs[0] = &oFlashing;
+    aFlashing0.outputArcsCount++;
+    aFlashing0.outputArcs[1] = &oArrive0;
+    aFlashing0.outputArcsCount++;
+
+    Transition aFlashing1;
+    aFlashing1.distribution = &dis3;
+    aFlashing1.inputArcs[0] = &flashAlone1;
+    aFlashing1.inputArcsCount++;
+    aFlashing1.inputArcs[1] = &flashAlone11;
+    aFlashing1.inputArcsCount++;
+    aFlashing1.inputArcs[2] = &aChargedSum;
+    aFlashing1.inputArcsCount++;
+    aFlashing1.outputArcs[0] = &oFlashing;
+    aFlashing1.outputArcsCount++;
+    aFlashing1.outputArcs[1] = &oArrive1;
+    aFlashing1.outputArcsCount++;
+
+    Transition aFlashing2;
+    aFlashing2.distribution = &dis3;
+    aFlashing2.inputArcs[0] = &flashAlone2;
+    aFlashing2.inputArcsCount++;
+    aFlashing2.inputArcs[1] = &flashAlone21;
+    aFlashing2.inputArcsCount++;
+    aFlashing2.inputArcs[2] = &aChargedSum;
+    aFlashing2.inputArcsCount++;
+    aFlashing2.outputArcs[0] = &oFlashing;
+    aFlashing2.outputArcsCount++;
+    aFlashing2.outputArcs[1] = &oArrive2;
+    aFlashing2.outputArcsCount++;
+
+    Transition aFlashing3;
+    aFlashing3.distribution = &dis3;
+    aFlashing3.inputArcs[0] = &flashAlone3;
+    aFlashing3.inputArcsCount++;
+    aFlashing3.inputArcs[1] = &flashAlone31;
+    aFlashing3.inputArcsCount++;
+    aFlashing3.inputArcs[2] = &aChargedSum;
+    aFlashing3.inputArcsCount++;
+    aFlashing3.outputArcs[0] = &oFlashing;
+    aFlashing3.outputArcsCount++;
+    aFlashing3.outputArcs[1] = &oArrive3;
+    aFlashing3.outputArcsCount++;
+
+    Arc aAllDone0;
+    aAllDone0.place = &chargedSum;
+    aAllDone0.type = INHIBITOR;
+    aAllDone0.constraint = 1;
+    aAllDone0.timings[0] = 0.0f;
+    aAllDone0.timings[1] = FLT_MAX;
+
+    Arc aAllDone1;
+    aAllDone1.place = &flashing;
+    aAllDone1.type = INPUT;
+    aAllDone1.constraint = 1;
+    aAllDone1.timings[0] = 0.0f;
+    aAllDone1.timings[1] = FLT_MAX;
+
+    Distribution dis4;
+    dis4.type = CONSTANT;
+    dis4.a = 0.0f;
+    // Place noWhere;
+    // OutputArc oNoWhere;
+    // oNoWhere.isTransport = false;
+    // oNoWhere.output = &noWhere;
+    Transition tAllDone;
+    tAllDone.distribution = &dis4;
+    tAllDone.inputArcs[0] = &aAllDone0;
+    tAllDone.inputArcsCount++;
+    tAllDone.inputArcs[1] = &aAllDone1;
+    tAllDone.inputArcsCount++;
+    // tAllDone.outputArcs[0] = &oNoWhere;
+    // tAllDone.outputArcsCount++;
+    Arc flashJointly0;
+    flashAlone0.place = &charged0;
+    flashAlone0.type = INPUT;
+    flashAlone0.timings[0] = 0.0f;
+    flashAlone0.timings[1] = FLT_MAX;
+    Arc flashJointly1;
+    flashAlone1.place = &charged1;
+    flashAlone1.type = INPUT;
+    flashAlone1.timings[0] = 0.0f;
+    flashAlone1.timings[1] = FLT_MAX;
+    Arc flashJointly2;
+    flashAlone2.place = &charged2;
+    flashAlone2.type = INPUT;
+    flashAlone2.timings[0] = 0.0f;
+    flashAlone2.timings[1] = FLT_MAX;
+    Arc flashJointly3;
+    flashAlone3.place = &charged3;
+    flashAlone3.type = INPUT;
+    flashAlone3.timings[0] = 0.0f;
+    flashAlone3.timings[1] = FLT_MAX;
+
+    Transition tFlashJointly0;
+    tFlashJointly0.urgent = true;
+    tFlashJointly0.distribution = &dis4;
+    tFlashJointly0.inputArcs[0] = &flashJointly0;
+    tFlashJointly0.inputArcsCount++;
+    tFlashJointly0.inputArcs[1] = &aChargedSum;
+    tFlashJointly0.inputArcsCount++;
+    tFlashJointly0.outputArcs[0] = &oFlashing;
+    tFlashJointly0.outputArcsCount++;
+    tFlashJointly0.outputArcs[1] = &oArrive3;
+    tFlashJointly0.outputArcsCount++;
+
+    Transition tFlashJointly1;
+    tFlashJointly1.urgent = true;
+    tFlashJointly1.distribution = &dis4;
+    tFlashJointly1.inputArcs[0] = &flashJointly0;
+    tFlashJointly1.inputArcsCount++;
+    tFlashJointly1.inputArcs[1] = &aChargedSum;
+    tFlashJointly1.inputArcsCount++;
+    tFlashJointly1.outputArcs[0] = &oFlashing;
+    tFlashJointly1.outputArcsCount++;
+    tFlashJointly1.outputArcs[1] = &oArrive3;
+    tFlashJointly1.outputArcsCount++;
+
+    Transition tFlashJointly2;
+    tFlashJointly2.urgent = true;
+    tFlashJointly2.distribution = &dis4;
+    tFlashJointly2.inputArcs[0] = &flashJointly0;
+    tFlashJointly2.inputArcsCount++;
+    tFlashJointly2.inputArcs[1] = &aChargedSum;
+    tFlashJointly2.inputArcsCount++;
+    tFlashJointly2.outputArcs[0] = &oFlashing;
+    tFlashJointly2.outputArcsCount++;
+    tFlashJointly2.outputArcs[1] = &oArrive3;
+    tFlashJointly2.outputArcsCount++;
+
+    Transition tFlashJointly3;
+    tFlashJointly3.urgent = true;
+    tFlashJointly3.distribution = &dis4;
+    tFlashJointly3.inputArcs[0] = &flashJointly0;
+    tFlashJointly3.inputArcsCount++;
+    tFlashJointly3.inputArcs[1] = &aChargedSum;
+    tFlashJointly3.inputArcsCount++;
+    tFlashJointly3.outputArcs[0] = &oFlashing;
+    tFlashJointly3.outputArcsCount++;
+    tFlashJointly3.outputArcs[1] = &oArrive3;
+    tFlashJointly3.outputArcsCount++;
+
+    Place *places[14]{&waiting0, &waiting1, &waiting2, &waiting3, &charging0, &charging1, &charging2, &charging3, &chargedSum, &flashing};
+    net.places = places;
+    net.placesCount = 14;
+
+    Transition *transitions[17]{&aArrive0, &aArrive1, &aArrive2, &aArrive3, &aReady0, &aReady1, &aReady2, &aReady3, &aFlashing0, &aFlashing1, &aFlashing2, &aFlashing3, &tAllDone, &tFlashJointly0, &tFlashJointly1, &tFlashJointly2, &tFlashJointly3};
+    net.transitions = transitions;
+    net.transitionsCount = 17;
+    net.run();
+    printf("steps %d", net.steps);
+}
+
+int main(int argc, char *argv[])
+{
+    auto start = std::chrono::high_resolution_clock::now();
+    float confidence;
+    float error;
+    int threads = 512;
+    int blockCount = 2048;
+    if (argc < 3)
+    {
+        confidence = 0.95f;
+        error = 0.0008f;
+    }
+    else
+    {
+        confidence = std::stof(argv[1]);
+        error = std::stof(argv[2]);
+    }
+    std::cout << "confidence: " << confidence << " error: " << error << std::endl;
+    float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
+    std::cout << "number of executions: " << number << std::endl;
+    int executionCount = ceil(number / threads);
+    int loopCount = ceil(executionCount / blockCount);
+    std::cout << "number of executions: " << executionCount << std::endl;
+    std::cout << "number of executions: " << loopCount * blockCount * threads << std::endl;
+    float *d_results;
+
+    cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float));
+    cudaMemset((void **)&d_results, 0, blockCount * threads * sizeof(float));
+    for (size_t i = 0; i < loopCount; i++)
+    {
+        fireflies<<<blockCount, threads>>>(d_results);
+        cudaDeviceSynchronize();
+    }
+    cudaError_t errSync = cudaDeviceSynchronize();
+    cudaError_t errAsync = cudaGetLastError();
+
+    if (errSync != cudaSuccess)
+    {
+        // printf("Sync error: %s\n", cudaGetErrorString(errSync));
+    }
+    if (errAsync != cudaSuccess)
+    {
+        // printf("Launch error: %s\n", cudaGetErrorString(errAsync));
+    }
+    cudaFree(d_results);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << "time run: " << duration.count() << std::endl;
+    return 0;
 }

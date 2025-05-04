@@ -114,9 +114,13 @@ __device__ void Distribution::sample(float *result)
     case NORMAL:
         // a is used for the for the mean by the normal distribution
         // b is used for the maximum value created by the uniform distribution
-        *result = a + b * curand_normal(&state);;
+        *result = a + b * curand_normal(&state);
+        ;
         break;
-    } // more distributions to come
+    case EXPONENTIAL:
+        *result = expf(a);
+        break; // more distributions to come
+    }
 }
 __device__ void Distribution::init()
 {
