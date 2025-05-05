@@ -1,11 +1,25 @@
 #include "fireflies.h"
+
+// Helper function to check CUDA errors
+#define checkCudaErrors(call) { \
+    cudaError_t err = call; \
+    if (err != cudaSuccess) { \
+        std::cerr << "CUDA error in " << __FILE__ << " at line " << __LINE__ << ": " \
+                 << cudaGetErrorString(err) << std::endl; \
+        exit(EXIT_FAILURE); \
+    } \
+}
+
+
 __global__ void fireflies(float *results)
 {
-    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    // printf("start of fireflies");
+    // int tid = blockIdx.x * blockDim.x + threadIdx.x;
     Tapn net;
 
     float token = 0.0f;
     // starting transitions transitions
+    // printf("waiting and tokens");
     Place waiting0;
     waiting0.addTokens(&token, 1);
     Place waiting1;
@@ -202,33 +216,33 @@ __global__ void fireflies(float *results)
     flashAlone3.timings[1] = FLT_MAX;
 
     Arc flashAlone01;
-    flashAlone0.place = &charged0;
-    flashAlone0.type = INPUT;
-    flashAlone0.timings[0] = 0.0f;
-    flashAlone0.timings[1] = FLT_MAX;
+    flashAlone01.place = &charged0;
+    flashAlone01.type = INPUT;
+    flashAlone01.timings[0] = 0.0f;
+    flashAlone01.timings[1] = FLT_MAX;
     Arc flashAlone11;
-    flashAlone1.place = &charged1;
-    flashAlone1.type = INPUT;
-    flashAlone1.timings[0] = 0.0f;
-    flashAlone1.timings[1] = FLT_MAX;
+    flashAlone11.place = &charged1;
+    flashAlone11.type = INPUT;
+    flashAlone11.timings[0] = 0.0f;
+    flashAlone11.timings[1] = FLT_MAX;
     Arc flashAlone21;
-    flashAlone2.place = &charged2;
-    flashAlone2.type = INPUT;
-    flashAlone2.timings[0] = 0.0f;
-    flashAlone2.timings[1] = FLT_MAX;
+    flashAlone21.place = &charged2;
+    flashAlone21.type = INPUT;
+    flashAlone21.timings[0] = 0.0f;
+    flashAlone21.timings[1] = FLT_MAX;
     Arc flashAlone31;
-    flashAlone3.place = &charged3;
-    flashAlone3.type = INPUT;
-    flashAlone3.timings[0] = 0.0f;
-    flashAlone3.timings[1] = FLT_MAX;
+    flashAlone31.place = &charged3;
+    flashAlone31.type = INPUT;
+    flashAlone31.timings[0] = 0.0f;
+    flashAlone31.timings[1] = FLT_MAX;
 
     OutputArc oFlashing;
-    oReady0.isTransport = false;
-    oReady0.output = &flashing;
+    oFlashing.isTransport = false;
+    oFlashing.output = &flashing;
 
     Distribution dis3;
-    dis2.type = EXPONENTIAL;
-    dis2.a = 0.5f;
+    dis3.type = EXPONENTIAL;
+    dis3.a = 0.5f;
 
     Transition aFlashing0;
     aFlashing0.distribution = &dis3;
@@ -299,38 +313,42 @@ __global__ void fireflies(float *results)
     Distribution dis4;
     dis4.type = CONSTANT;
     dis4.a = 0.0f;
-    // Place noWhere;
-    // OutputArc oNoWhere;
-    // oNoWhere.isTransport = false;
-    // oNoWhere.output = &noWhere;
+
+
+    Place noWhere;
+    OutputArc oNoWhere;
+    oNoWhere.isTransport = false;
+    oNoWhere.output = &noWhere;
+
+
     Transition tAllDone;
     tAllDone.distribution = &dis4;
     tAllDone.inputArcs[0] = &aAllDone0;
     tAllDone.inputArcsCount++;
     tAllDone.inputArcs[1] = &aAllDone1;
     tAllDone.inputArcsCount++;
-    // tAllDone.outputArcs[0] = &oNoWhere;
-    // tAllDone.outputArcsCount++;
+    tAllDone.outputArcs[0] = &oNoWhere;
+    tAllDone.outputArcsCount++;
     Arc flashJointly0;
-    flashAlone0.place = &charged0;
-    flashAlone0.type = INPUT;
-    flashAlone0.timings[0] = 0.0f;
-    flashAlone0.timings[1] = FLT_MAX;
+    flashJointly0.place = &charged0;
+    flashJointly0.type = INPUT;
+    flashJointly0.timings[0] = 0.0f;
+    flashJointly0.timings[1] = FLT_MAX;
     Arc flashJointly1;
-    flashAlone1.place = &charged1;
-    flashAlone1.type = INPUT;
-    flashAlone1.timings[0] = 0.0f;
-    flashAlone1.timings[1] = FLT_MAX;
+    flashJointly1.place = &charged1;
+    flashJointly1.type = INPUT;
+    flashJointly1.timings[0] = 0.0f;
+    flashJointly1.timings[1] = FLT_MAX;
     Arc flashJointly2;
-    flashAlone2.place = &charged2;
-    flashAlone2.type = INPUT;
-    flashAlone2.timings[0] = 0.0f;
-    flashAlone2.timings[1] = FLT_MAX;
+    flashJointly2.place = &charged2;
+    flashJointly2.type = INPUT;
+    flashJointly2.timings[0] = 0.0f;
+    flashJointly2.timings[1] = FLT_MAX;
     Arc flashJointly3;
-    flashAlone3.place = &charged3;
-    flashAlone3.type = INPUT;
-    flashAlone3.timings[0] = 0.0f;
-    flashAlone3.timings[1] = FLT_MAX;
+    flashJointly3.place = &charged3;
+    flashJointly3.type = INPUT;
+    flashJointly3.timings[0] = 0.0f;
+    flashJointly3.timings[1] = FLT_MAX;
 
     Transition tFlashJointly0;
     tFlashJointly0.urgent = true;
@@ -341,37 +359,37 @@ __global__ void fireflies(float *results)
     tFlashJointly0.inputArcsCount++;
     tFlashJointly0.outputArcs[0] = &oFlashing;
     tFlashJointly0.outputArcsCount++;
-    tFlashJointly0.outputArcs[1] = &oArrive3;
+    tFlashJointly0.outputArcs[1] = &oArrive0;
     tFlashJointly0.outputArcsCount++;
 
     Transition tFlashJointly1;
     tFlashJointly1.urgent = true;
     tFlashJointly1.distribution = &dis4;
-    tFlashJointly1.inputArcs[0] = &flashJointly0;
+    tFlashJointly1.inputArcs[0] = &flashJointly1;
     tFlashJointly1.inputArcsCount++;
     tFlashJointly1.inputArcs[1] = &aChargedSum;
     tFlashJointly1.inputArcsCount++;
     tFlashJointly1.outputArcs[0] = &oFlashing;
     tFlashJointly1.outputArcsCount++;
-    tFlashJointly1.outputArcs[1] = &oArrive3;
+    tFlashJointly1.outputArcs[1] = &oArrive1;
     tFlashJointly1.outputArcsCount++;
 
     Transition tFlashJointly2;
     tFlashJointly2.urgent = true;
     tFlashJointly2.distribution = &dis4;
-    tFlashJointly2.inputArcs[0] = &flashJointly0;
+    tFlashJointly2.inputArcs[0] = &flashJointly2;
     tFlashJointly2.inputArcsCount++;
     tFlashJointly2.inputArcs[1] = &aChargedSum;
     tFlashJointly2.inputArcsCount++;
     tFlashJointly2.outputArcs[0] = &oFlashing;
     tFlashJointly2.outputArcsCount++;
-    tFlashJointly2.outputArcs[1] = &oArrive3;
+    tFlashJointly2.outputArcs[1] = &oArrive2;
     tFlashJointly2.outputArcsCount++;
 
     Transition tFlashJointly3;
     tFlashJointly3.urgent = true;
     tFlashJointly3.distribution = &dis4;
-    tFlashJointly3.inputArcs[0] = &flashJointly0;
+    tFlashJointly3.inputArcs[0] = &flashJointly3;
     tFlashJointly3.inputArcsCount++;
     tFlashJointly3.inputArcs[1] = &aChargedSum;
     tFlashJointly3.inputArcsCount++;
@@ -380,13 +398,14 @@ __global__ void fireflies(float *results)
     tFlashJointly3.outputArcs[1] = &oArrive3;
     tFlashJointly3.outputArcsCount++;
 
-    Place *places[14]{&waiting0, &waiting1, &waiting2, &waiting3, &charging0, &charging1, &charging2, &charging3, &chargedSum, &flashing};
+    Place *places[15]{&noWhere,&waiting0, &waiting1, &waiting2, &waiting3, &charging0, &charging1, &charging2, &charging3, &charged0,&charged1,&charged2,&charged3, &chargedSum, &flashing};
     net.places = places;
-    net.placesCount = 14;
+    net.placesCount = 15;
 
     Transition *transitions[17]{&aArrive0, &aArrive1, &aArrive2, &aArrive3, &aReady0, &aReady1, &aReady2, &aReady3, &aFlashing0, &aFlashing1, &aFlashing2, &aFlashing3, &tAllDone, &tFlashJointly0, &tFlashJointly1, &tFlashJointly2, &tFlashJointly3};
     net.transitions = transitions;
     net.transitionsCount = 17;
+
     net.run();
     printf("steps %d", net.steps);
 }
@@ -396,12 +415,12 @@ int main(int argc, char *argv[])
     auto start = std::chrono::high_resolution_clock::now();
     float confidence;
     float error;
-    int threads = 512;
+    int threads = 64;
     int blockCount = 2048;
     if (argc < 3)
     {
         confidence = 0.95f;
-        error = 0.0008f;
+        error = 0.001f;
     }
     else
     {
@@ -413,27 +432,27 @@ int main(int argc, char *argv[])
     std::cout << "number of executions: " << number << std::endl;
     int executionCount = ceil(number / threads);
     int loopCount = ceil(executionCount / blockCount);
-    std::cout << "number of executions: " << executionCount << std::endl;
+    std::cout << "loop count: " << loopCount << std::endl;
     std::cout << "number of executions: " << loopCount * blockCount * threads << std::endl;
     float *d_results;
 
-    cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float));
-    cudaMemset((void **)&d_results, 0, blockCount * threads * sizeof(float));
+    checkCudaErrors(cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float)));
+    // checkCudaErrors(cudaMemset((void **)&d_results, 0, blockCount * threads * sizeof(float)));
     for (size_t i = 0; i < loopCount; i++)
     {
         fireflies<<<blockCount, threads>>>(d_results);
-        cudaDeviceSynchronize();
+        checkCudaErrors(cudaDeviceSynchronize());
     }
     cudaError_t errSync = cudaDeviceSynchronize();
     cudaError_t errAsync = cudaGetLastError();
 
     if (errSync != cudaSuccess)
     {
-        // printf("Sync error: %s\n", cudaGetErrorString(errSync));
+        printf("Sync error: %s\n", cudaGetErrorString(errSync));
     }
     if (errAsync != cudaSuccess)
     {
-        // printf("Launch error: %s\n", cudaGetErrorString(errAsync));
+        printf("Launch error: %s\n", cudaGetErrorString(errAsync));
     }
     cudaFree(d_results);
     auto stop = std::chrono::high_resolution_clock::now();
