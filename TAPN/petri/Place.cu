@@ -108,6 +108,11 @@ __device__ void Place::addTokens(float *token, int count)
 {
     // //printf("adding tokens \n");
     // //printf("token %f \n", *token);
+    if(tokenCount>=8)
+    {
+        printf("to many tokens");
+        return;
+    }
     for (size_t i = 0; i < count; i++)
     {
         this->tokens[this->tokenCount++] = token[i];

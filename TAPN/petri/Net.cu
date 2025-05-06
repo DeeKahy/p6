@@ -13,7 +13,6 @@ __device__ void Tapn::notify_observers(const SimulationEvent *event)
     {
         observers[i]->onStep(event);
     }
-    
 }
 
 __device__ void Tapn::step(bool *result)
@@ -126,10 +125,34 @@ __device__ void Tapn::run()
     // {
     //     step(&result);
     // }
-    
+    // printf("First sanity check - place pointers:\n");
+    // for (size_t i = 0; i < placesCount; i++) {
+    //     printf("Place %zu pointer: %p, token count: %d \n", 
+    //            i, places[i], places[i]->tokenCount);
+    // }
     while (result)
     {
+        for (size_t i = 0; i < placesCount; i++)
+        {
+            // if (places[4]->tokenCount == 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
+            //     places[13]->tokenCount == 1 &&
+            //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 && places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+            // {
+            //     return;
+            // }
+            printf("\nplace %i ", i);
+            for (size_t j = 0; j < places[i]->tokenCount; j++)
+            {
+                printf("token number%d %f ",j,places[i]->tokens[j]);
+            }
+        }
+
         step(&result);
+        if(steps>=30)
+        {
+            return;
+        }
+
     }
     // for (size_t i = 0; i < observersCount; i++)
     // {
@@ -166,9 +189,9 @@ __device__ void Tapn::updateTokenAges(float *delay)
     {
         for (size_t j = 0; j < places[i]->tokenCount; j++)
         {
-            //printf("\ntoken before%f\n",places[i]->tokens[j]);
+            // printf("\ntoken before%f\n",places[i]->tokens[j]);
             places[i]->tokens[j] += *delay;
-            //printf("\ntoken after%f\n",places[i]->tokens[j]);
+            // printf("\ntoken after%f\n",places[i]->tokens[j]);
         }
     }
 }

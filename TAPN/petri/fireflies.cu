@@ -18,16 +18,17 @@ __global__ void fireflies(float *results)
     Tapn net;
 
     float token = 0.0f;
+    float tokens[1] {token};
     // starting transitions transitions
     // printf("waiting and tokens");
     Place waiting0;
-    waiting0.addTokens(&token, 1);
+    waiting0.addTokens(tokens, 1);
     Place waiting1;
-    waiting1.addTokens(&token, 1);
+    waiting1.addTokens(tokens, 1);
     Place waiting2;
-    waiting2.addTokens(&token, 1);
+    waiting2.addTokens(tokens, 1);
     Place waiting3;
-    waiting3.addTokens(&token, 1);
+    waiting3.addTokens(tokens, 1);
 
     Distribution dis1;
     dis1.type = UNIFORM;
@@ -398,13 +399,16 @@ __global__ void fireflies(float *results)
     tFlashJointly3.outputArcs[1] = &oArrive3;
     tFlashJointly3.outputArcsCount++;
 
-    Place *places[15]{&noWhere,&waiting0, &waiting1, &waiting2, &waiting3, &charging0, &charging1, &charging2, &charging3, &charged0,&charged1,&charged2,&charged3, &chargedSum, &flashing};
+    Place *places[14]{&waiting0, &waiting1, &waiting2, &waiting3, &charging0, &charging1, &charging2, &charging3, &charged0,&charged1,&charged2,&charged3, &chargedSum, &flashing};
     net.places = places;
-    net.placesCount = 15;
+    net.placesCount = 14;
 
     Transition *transitions[17]{&aArrive0, &aArrive1, &aArrive2, &aArrive3, &aReady0, &aReady1, &aReady2, &aReady3, &aFlashing0, &aFlashing1, &aFlashing2, &aFlashing3, &tAllDone, &tFlashJointly0, &tFlashJointly1, &tFlashJointly2, &tFlashJointly3};
     net.transitions = transitions;
     net.transitionsCount = 17;
+
+    // TokenCountObserver observer;
+    // net.addObserver(&observer);
 
     net.run();
     printf("steps %d", net.steps);
@@ -438,9 +442,9 @@ int main(int argc, char *argv[])
 
     checkCudaErrors(cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float)));
     // checkCudaErrors(cudaMemset((void **)&d_results, 0, blockCount * threads * sizeof(float)));
-    for (size_t i = 0; i < loopCount; i++)
+    for (size_t i = 0; i < 1; i++)
     {
-        fireflies<<<blockCount, threads>>>(d_results);
+        fireflies<<<1, 1>>>(d_results);
         checkCudaErrors(cudaDeviceSynchronize());
     }
     cudaError_t errSync = cudaDeviceSynchronize();
