@@ -48,7 +48,8 @@ __device__ void Tapn::step(bool *result)
         int transitionIndex = enabled[i].index;
         if (transitions[transitionIndex]->urgent)
         {
-            urgentTransitionIndex = i;
+            urgentTransitionIndex = transitionIndex; // Store actual transition index
+            break;                                   // Stop at first urgent transition found
         }
     }
 
@@ -113,7 +114,7 @@ __device__ void Tapn::firingCount(int index, int *result)
     *result = transitionFirings[index];
 }
 
-__device__ void Tapn::run()
+__device__ void Tapn::run(bool *success)
 {
     bool result;
     shouldContinue(&result);
@@ -127,32 +128,34 @@ __device__ void Tapn::run()
     // }
     // printf("First sanity check - place pointers:\n");
     // for (size_t i = 0; i < placesCount; i++) {
-    //     printf("Place %zu pointer: %p, token count: %d \n", 
+    //     printf("Place %zu pointer: %p, token count: %d \n",
     //            i, places[i], places[i]->tokenCount);
     // }
     while (result)
     {
-        for (size_t i = 0; i < placesCount; i++)
+        if (places[4]->tokenCount == 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
+            places[13]->tokenCount == 1 &&
+            places[0]->tokenCount == 0 && places[1]->tokenCount == 0 && places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
         {
-            // if (places[4]->tokenCount == 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
-            //     places[13]->tokenCount == 1 &&
-            //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 && places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
-            // {
-            //     return;
-            // }
-            printf("\nplace %i ", i);
-            for (size_t j = 0; j < places[i]->tokenCount; j++)
-            {
-                printf("token number%d %f ",j,places[i]->tokens[j]);
-            }
-        }
-
-        step(&result);
-        if(steps>=30)
-        {
+            *success = true;
+            // printf("_______________________________________________SUCCESS__________________________");
             return;
         }
+        // for (size_t i = 0; i < placesCount; i++)
+        // {
+        //     printf("\nplace %i ", i);
+        //     for (size_t j = 0; j < places[i]->tokenCount; j++)
+        //     {
+        //         printf("token number%d %f ", j, places[i]->tokens[j]);
+        //     }
+        // }
 
+        step(&result);
+        if (steps >= 30)
+        {
+            *success = false;
+            return;
+        }
     }
     // for (size_t i = 0; i < observersCount; i++)
     // {

@@ -14,7 +14,7 @@
 __global__ void fireflies(float *results)
 {
     // printf("start of fireflies");
-    // int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
     Tapn net;
 
     float token = 0.0f;
@@ -106,22 +106,22 @@ __global__ void fireflies(float *results)
     dis2.init();
 
     Arc ready0;
-    ready0.place = &waiting0;
+    ready0.place = &charging0;
     ready0.type = INPUT;
     ready0.timings[0] = 1.0f;
     ready0.timings[1] = FLT_MAX;
     Arc ready1;
-    ready1.place = &waiting1;
+    ready1.place = &charging1;
     ready1.type = INPUT;
     ready1.timings[0] = 1.0f;
     ready1.timings[1] = FLT_MAX;
     Arc ready2;
-    ready2.place = &waiting2;
+    ready2.place = &charging2;
     ready2.type = INPUT;
     ready2.timings[0] = 1.0f;
     ready2.timings[1] = FLT_MAX;
     Arc ready3;
-    ready3.place = &waiting3;
+    ready3.place = &charging3;
     ready3.type = INPUT;
     ready3.timings[0] = 1.0f;
     ready3.timings[1] = FLT_MAX;
@@ -409,9 +409,30 @@ __global__ void fireflies(float *results)
 
     // TokenCountObserver observer;
     // net.addObserver(&observer);
+    bool success {false};
+    net.run(&success);
+    results[tid] += success;
+}
+__global__ void sum(float *array, int numSimulations)
+{
+    float total = 0.0f;
+    for (int i = 0; i < 512; i++)
+    {
+        total += array[i];
+    }
+    printf("euler value is %.11f\n", (double)total / numSimulations);
+}
+__global__ void summage(float *array, int numSimulations)
+{
+    int tid = threadIdx.x;
+    float sum = 0.0f;
 
-    net.run();
-    printf("steps %d", net.steps);
+    for (int i = 0; i < numSimulations / 512; i++)
+    {
+        sum += array[tid + i * 512];
+    }
+
+    array[tid] = sum;
 }
 
 int main(int argc, char *argv[])
@@ -441,12 +462,16 @@ int main(int argc, char *argv[])
     float *d_results;
 
     checkCudaErrors(cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float)));
-    // checkCudaErrors(cudaMemset((void **)&d_results, 0, blockCount * threads * sizeof(float)));
-    for (size_t i = 0; i < 1; i++)
+    checkCudaErrors(cudaMemset(d_results, 0, blockCount * threads * sizeof(float)));
+
+    for (size_t i = 0; i < loopCount; i++)
     {
-        fireflies<<<1, 1>>>(d_results);
+        fireflies<<<blockCount, threads>>>(d_results);
         checkCudaErrors(cudaDeviceSynchronize());
     }
+    summage<<<1, threads>>>(d_results, blockCount * threads);
+    cudaDeviceSynchronize();
+    sum<<<1, 1>>>(d_results, loopCount * blockCount * threads);
     cudaError_t errSync = cudaDeviceSynchronize();
     cudaError_t errAsync = cudaGetLastError();
 

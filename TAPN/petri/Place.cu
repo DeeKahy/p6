@@ -44,30 +44,36 @@ __device__ void Place::invariantHold(int tokenCount, bool *returne)
  * @param removedTokens a pointer to the where the removed tokens should go
  * @return returns the removed tokens into the removedTokens pointer
  */
-__device__ void Place::removeTokens(int amount, float *removedTokens, int *count)
-{
+__device__ void Place::removeTokens(int amount, float *removedTokens, int *count) {
     *count = 0;
-    //printf("\nremoved before\n%f", this->tokens[0]);
-    // //printf("Removing tokens!!!\n");
-    // //printf("amount %d", amount);
-    for (size_t i = 0; i < amount; i++)
-    {
-        for (size_t j = 0; j < this->tokenCount; j++)
-        {
-            // //printf("tokens j %f\n",this->tokens[j]);
-            // //printf("tokens j %f\n",removedTokens[0] );
-            if (removedTokens[i] > this->tokens[j])
-            {
-                removedTokens[i] = this->tokens[j];
-                this->tokens[j] = FLT_MAX;
-                this->tokenCount--;
-                this->shiftTokens();
-                *count+=1;
-
+    
+    // First find the youngest tokens
+    for (int i = 0; i < amount && i < this->tokenCount; i++) {
+        float youngest = FLT_MAX;
+        int youngestIdx = -1;
+        
+        for (int j = 0; j < this->tokenCount; j++) {
+            if (this->tokens[j] < youngest) {
+                youngest = this->tokens[j];
+                youngestIdx = j;
             }
         }
+        
+        if (youngestIdx >= 0) {
+            removedTokens[i] = this->tokens[youngestIdx];
+            this->tokens[youngestIdx] = FLT_MAX;
+            (*count)++;
+        }
     }
-    //printf("\nremoved after\n%f", this->tokens[0]);
+    
+    // Then compact the array once
+    int newCount = 0;
+    for (int i = 0; i < this->tokenCount; i++) {
+        if (this->tokens[i] != FLT_MAX) {
+            this->tokens[newCount++] = this->tokens[i];
+        }
+    }
+    this->tokenCount = newCount;
 }
 
 /**
@@ -108,7 +114,7 @@ __device__ void Place::addTokens(float *token, int count)
 {
     // //printf("adding tokens \n");
     // //printf("token %f \n", *token);
-    if(tokenCount>=8)
+    if(tokenCount>=20)
     {
         printf("to many tokens");
         return;
