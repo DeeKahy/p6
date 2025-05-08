@@ -416,7 +416,7 @@ __global__ void fireflies(float *results)
 __global__ void sum(float *array, int numSimulations)
 {
     float total = 0.0f;
-    for (int i = 0; i < 512; i++)
+    for (int i = 0; i < 64 ; i++)
     {
         total += array[i];
     }
@@ -427,9 +427,9 @@ __global__ void summage(float *array, int numSimulations)
     int tid = threadIdx.x;
     float sum = 0.0f;
 
-    for (int i = 0; i < numSimulations / 512; i++)
+    for (int i = 0; i < numSimulations / 64 ; i++)
     {
-        sum += array[tid + i * 512];
+        sum += array[tid + i * 64 ];
     }
 
     array[tid] = sum;
@@ -441,7 +441,7 @@ int main(int argc, char *argv[])
     float confidence;
     float error;
     int threads = 64;
-    int blockCount = 2048;
+    int blockCount = 512;
     if (argc < 3)
     {
         confidence = 0.95f;
@@ -466,7 +466,7 @@ int main(int argc, char *argv[])
 
     for (size_t i = 0; i < loopCount; i++)
     {
-        fireflies<<<blockCount, threads>>>(d_results);
+        fireflies<<<1, threads>>>(d_results);
         checkCudaErrors(cudaDeviceSynchronize());
     }
     summage<<<1, threads>>>(d_results, blockCount * threads);

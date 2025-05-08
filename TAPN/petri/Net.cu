@@ -133,7 +133,7 @@ __device__ void Tapn::run(bool *success)
     // }
     while (result)
     {
-        if (places[4]->tokenCount == 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
+        if (places[4]->tokenCount = 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
             places[13]->tokenCount == 1 &&
             places[0]->tokenCount == 0 && places[1]->tokenCount == 0 && places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
         {
