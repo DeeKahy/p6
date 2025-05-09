@@ -427,6 +427,7 @@ __global__ void fireflies(float *results)
     bool success{false};
     net.run2(&success);
     results[tid] += success;
+    // lenghts[tid] += net.steps;
 }
 __global__ void sum(float *array, int numSimulations, int totalThreads)
 {
@@ -461,7 +462,7 @@ int main(int argc, char *argv[])
     if (argc < 3)
     {
         confidence = 0.95f;
-        error = 0.0005f;
+        error = 0.005f;
     }
     else
     {
@@ -476,18 +477,24 @@ int main(int argc, char *argv[])
     std::cout << "loop count: " << loopCount << std::endl;
     std::cout << "number of executions: " << loopCount * blockCount * threads << std::endl;
     float *d_results;
-
+    // float *d_lenght;
     checkCudaErrors(cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float)));
     checkCudaErrors(cudaMemset(d_results, 0, blockCount * threads * sizeof(float)));
-
+    // checkCudaErrors(cudaMalloc((void **)&d_lenght, blockCount * threads * sizeof(float)));
+    // checkCudaErrors(cudaMemset(d_lenght, 0, blockCount * threads * sizeof(float)));
     for (size_t i = 0; i < loopCount; i++)
     {
         fireflies<<<blockCount, threads>>>(d_results);
         checkCudaErrors(cudaDeviceSynchronize());
     }
-    summage<<<1, threads>>>(d_results, blockCount * threads,threads);
+    summage<<<1, threads>>>(d_results, blockCount * threads, threads);
     cudaDeviceSynchronize();
-    sum<<<1, 1>>>(d_results, loopCount * blockCount * threads,threads);
+    sum<<<1, 1>>>(d_results, loopCount * blockCount * threads, threads);
+    cudaDeviceSynchronize();
+    // summage<<<1, threads>>>(d_lenght, blockCount * threads, threads);
+    // cudaDeviceSynchronize();
+    // sum<<<1, 1>>>(d_lenght, loopCount * blockCount * threads, threads);
+    // cudaDeviceSynchronize();
     cudaError_t errSync = cudaDeviceSynchronize();
     cudaError_t errAsync = cudaGetLastError();
 

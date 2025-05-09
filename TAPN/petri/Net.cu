@@ -32,14 +32,12 @@ __device__ void Tapn::step(bool *result)
             enabledCount++;
         }
     }
-    // //printf("%d\n", enabledCount);
-
-    // No enabled transitions
     if (enabledCount == 0)
     {
         float ageIncrease{1.0f};
         updateTokenAges(&ageIncrease);
         failedAttempt++;
+        steps++;
         delete[] enabled;
         if (failedAttempt >= 10)
         {
@@ -80,8 +78,6 @@ __device__ void Tapn::step(bool *result)
         }
     }
 
-    // If total delayed time is usefull at some point we can implement delay and start using it :shrugs:
-    // delay();
     bool success = false;
     fireTransition(lowestFiringTime.index, &success);
     delete[] enabled;
@@ -97,7 +93,6 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     SimulationEvent preEvent = event;
     notify_observers(&preEvent);
 
-    // updateTokenAges(&firingTime);
     currentTime += firingTime;
     float consumed[8]{FLT_MAX};
     int consumedCount{8};
@@ -106,8 +101,7 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
 
     transitionFirings[index]++;
     steps++;
-    // //printf("%d",steps);
-    // more observer stuff here
+
 
     *result = true;
 }
@@ -128,19 +122,6 @@ __device__ void Tapn::run()
 {
     bool result;
     shouldContinue(&result);
-    // for (size_t i = 0; i < count; i++)
-    // {
-    //     /* code */
-    // }
-    // for (size_t i = 0; i < 5; i++)
-    // {
-    //     step(&result);
-    // }
-    // printf("First sanity check - place pointers:\n");
-    // for (size_t i = 0; i < placesCount; i++) {
-    //     printf("Place %zu pointer: %p, token count: %d \n",
-    //            i, places[i], places[i]->tokenCount);
-    // }
     while (result)
     {
         step(&result);
@@ -149,28 +130,10 @@ __device__ void Tapn::run()
             return;
         }
     }
-    // for (size_t i = 0; i < observersCount; i++)
-    // {
-    //     observers[i].onCompletion();
-    // }
 }
 __device__ void Tapn::run2(bool *success)
 {
     bool result{true};
-    // shouldContinue(&result);
-    // for (size_t i = 0; i < count; i++)
-    // {
-    //     /* code */
-    // }
-    // for (size_t i = 0; i < 5; i++)
-    // {
-    //     step(&result);
-    // }
-    // printf("First sanity check - place pointers:\n");
-    // for (size_t i = 0; i < placesCount; i++) {
-    //     printf("Place %zu pointer: %p, token count: %d \n",
-    //            i, places[i], places[i]->tokenCount);
-    // }
     while (result)
     {
         // for (size_t i = 0; i < placesCount; i++)
@@ -268,17 +231,17 @@ __device__ void Tapn::run2(bool *success)
             return;
         }
 
-        step(&result);
-        if (currentTime > 30)
+        if (currentTime < 31)
         {
+            step(&result);
+        }
+        else
+        {
+
             *success = false;
             return;
         }
     }
-    // for (size_t i = 0; i < observersCount; i++)
-    // {
-    //     observers[i].onCompletion();
-    // }
 }
 
 __device__ void Tapn::shouldContinue(bool *result)
@@ -310,9 +273,7 @@ __device__ void Tapn::updateTokenAges(float *delay)
     {
         for (size_t j = 0; j < places[i]->tokenCount; j++)
         {
-            // printf("\ntoken before%f\n",places[i]->tokens[j]);
             places[i]->tokens[j] += *delay;
-            // printf("\ntoken after%f\n",places[i]->tokens[j]);
         }
     }
 }
