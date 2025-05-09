@@ -428,23 +428,24 @@ __global__ void fireflies(float *results)
     net.run2(&success);
     results[tid] += success;
 }
-__global__ void sum(float *array, int numSimulations)
+__global__ void sum(float *array, int numSimulations, int totalThreads)
 {
     float total = 0.0f;
-    for (int i = 0; i < 256; i++)
+
+    for (int i = 0; i < totalThreads; i++)
     {
         total += array[i];
     }
     printf("success rate is %.11f\n", (double)total / numSimulations);
 }
-__global__ void summage(float *array, int numSimulations)
+__global__ void summage(float *array, int numSimulations, int totalThreads)
 {
     int tid = threadIdx.x;
     float sum = 0.0f;
 
-    for (int i = 0; i < numSimulations / 256; i++)
+    for (int i = 0; i < numSimulations / totalThreads; i++)
     {
-        sum += array[tid + i * 256];
+        sum += array[tid + i * totalThreads];
     }
 
     array[tid] = sum;
@@ -460,7 +461,7 @@ int main(int argc, char *argv[])
     if (argc < 3)
     {
         confidence = 0.95f;
-        error = 0.001f;
+        error = 0.0005f;
     }
     else
     {
@@ -484,9 +485,9 @@ int main(int argc, char *argv[])
         fireflies<<<blockCount, threads>>>(d_results);
         checkCudaErrors(cudaDeviceSynchronize());
     }
-    summage<<<1, threads>>>(d_results, blockCount * threads);
+    summage<<<1, threads>>>(d_results, blockCount * threads,threads);
     cudaDeviceSynchronize();
-    sum<<<1, 1>>>(d_results, loopCount * blockCount * threads);
+    sum<<<1, 1>>>(d_results, loopCount * blockCount * threads,threads);
     cudaError_t errSync = cudaDeviceSynchronize();
     cudaError_t errAsync = cudaGetLastError();
 

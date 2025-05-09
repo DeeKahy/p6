@@ -66,7 +66,8 @@ __global__ void euler(float *results)
     // net.addObserver(&tokenAgeObs);
     // TokenCountObserver tokenCountObs;
     // net.addObserver(&tokenCountObs);
-    net.run();
+    bool test {false};
+    net.run2(&test);
     results[tid] += net.steps - 1;
     // net.step(&test);
     // //printf("\n place 0 %f\n", place1.tokens[0]);

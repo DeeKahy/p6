@@ -16,6 +16,7 @@ struct Tapn
     int steps{0};
     float currentTime{0.0f};
     int transitionFirings[20]{0};
+    int failedAttempt{0};
 
     __device__ void addObserver(SimulationObserver *observer);
     __device__ void notify_observers(const SimulationEvent *event);
