@@ -5,11 +5,11 @@
 struct Place
 {
     int id;
-
-    float tokens[8]{FLT_MAX};
     int tokenCount{0};
+    float tokens[8] {FLT_MAX};
+    
     Invariant *invariant{nullptr};
-    int invariantCount;
+    int invariantCount{0};
 
     __device__ void tokensHold(int amount, float timing[2], bool *returne);
     __device__ void invariantHold(int tokenCount, bool *returne);

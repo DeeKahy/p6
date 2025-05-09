@@ -46,7 +46,7 @@ __device__ void Place::invariantHold(int tokenCount, bool *returne)
  */
 __device__ void Place::removeTokens(int amount, float *removedTokens, int *count)
 {
-    *count = 0;
+
     //printf("\nremoved before\n%f", this->tokens[0]);
     // //printf("Removing tokens!!!\n");
     // //printf("amount %d", amount);
@@ -63,7 +63,6 @@ __device__ void Place::removeTokens(int amount, float *removedTokens, int *count
                 this->tokenCount--;
                 this->shiftTokens();
                 *count+=1;
-
             }
         }
     }
@@ -108,6 +107,11 @@ __device__ void Place::addTokens(float *token, int count)
 {
     // //printf("adding tokens \n");
     // //printf("token %f \n", *token);
+    if(tokenCount>=8)
+    {
+        printf("to many tokens");
+        return;
+    }
     for (size_t i = 0; i < count; i++)
     {
         this->tokens[this->tokenCount++] = token[i];

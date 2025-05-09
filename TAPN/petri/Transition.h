@@ -6,6 +6,8 @@ enum DistributionTypes
 {
     CONSTANT,
     UNIFORM,
+    NORMAL,
+    EXPONENTIAL,
 };
 
 struct Distribution
@@ -14,11 +16,14 @@ struct Distribution
     float a;
     float b;
     float c;
+    curandState state;
+    __device__ void init();
     __device__ void sample(float *result);
 };
 
 struct Transition
 {
+    
     Arc* inputArcs[5];
     int inputArcsCount{0};
     OutputArc* outputArcs[5];
@@ -27,8 +32,10 @@ struct Transition
     float firingTime{0.0f};
     bool urgent;
     int id;
+    
     __device__ void fire(float *consumed, int consumedCount, int *consumedAmout);
     __device__ void isReady(bool *result);
+
 };
 
 

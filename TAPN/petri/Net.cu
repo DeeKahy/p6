@@ -13,7 +13,6 @@ __device__ void Tapn::notify_observers(const SimulationEvent *event)
     {
         observers[i]->onStep(event);
     }
-    
 }
 
 __device__ void Tapn::step(bool *result)
@@ -33,13 +32,21 @@ __device__ void Tapn::step(bool *result)
             enabledCount++;
         }
     }
-    // //printf("%d\n", enabledCount);
-
-    // No enabled transitions
     if (enabledCount == 0)
     {
-        *result = false;
+        float ageIncrease{1.0f};
+        updateTokenAges(&ageIncrease);
+        failedAttempt++;
+        steps++;
         delete[] enabled;
+        if (failedAttempt >= 10)
+        {
+            *result = false;
+        }
+        else
+        {
+            *result = true;
+        }
         return;
     }
 
@@ -49,7 +56,8 @@ __device__ void Tapn::step(bool *result)
         int transitionIndex = enabled[i].index;
         if (transitions[transitionIndex]->urgent)
         {
-            urgentTransitionIndex = i;
+            urgentTransitionIndex = transitionIndex;
+            break;
         }
     }
 
@@ -70,8 +78,6 @@ __device__ void Tapn::step(bool *result)
         }
     }
 
-    // If total delayed time is usefull at some point we can implement delay and start using it :shrugs:
-    // delay();
     bool success = false;
     fireTransition(lowestFiringTime.index, &success);
     delete[] enabled;
@@ -87,8 +93,7 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     SimulationEvent preEvent = event;
     notify_observers(&preEvent);
 
-    updateTokenAges(&firingTime);
-
+    currentTime += firingTime;
     float consumed[8]{FLT_MAX};
     int consumedCount{8};
     int consumedAmount;
@@ -96,8 +101,7 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
 
     transitionFirings[index]++;
     steps++;
-    // //printf("%d",steps);
-    // more observer stuff here
+
 
     *result = true;
 }
@@ -118,23 +122,126 @@ __device__ void Tapn::run()
 {
     bool result;
     shouldContinue(&result);
-    // for (size_t i = 0; i < count; i++)
-    // {
-    //     /* code */
-    // }
-    // for (size_t i = 0; i < 5; i++)
-    // {
-    //     step(&result);
-    // }
-    
     while (result)
     {
         step(&result);
+        if (steps >= 30)
+        {
+            return;
+        }
     }
-    // for (size_t i = 0; i < observersCount; i++)
-    // {
-    //     observers[i].onCompletion();
-    // }
+}
+__device__ void Tapn::run2(bool *success)
+{
+    bool result{true};
+    while (result)
+    {
+        // for (size_t i = 0; i < placesCount; i++)
+        // {
+        //     // 0 &waiting0,
+        //     // 1 &waiting1,
+        //     // 2 &waiting2,
+        //     // 3 &waiting3,
+        //     // 4 &charging0,
+        //     // 5 &charging1,
+        //     // 6 &charging2,
+        //     // 7 &charging3,
+        //     // 8 &charged0,
+        //     // 9 &charged1,
+        //     // 10&charged2,
+        //     // 11&charged3,
+        //     // 12&chargedSum,
+        //     // 13&flashing};
+        //     switch (i)
+        //     {
+        //     case 0:
+        //         printf("waiting 0:");
+        //         break;
+        //     case 1:
+        //         printf("waiting 1:");
+        //         break;
+        //     case 2:
+        //         printf("waiting 2:");
+        //         break;
+        //     case 3:
+        //         printf("waiting 3:");
+        //         break;
+        //     case 4:
+        //         printf("charging 0:");
+        //         break;
+        //     case 5:
+        //         printf("charging 1:");
+        //         break;
+        //     case 6:
+        //         printf("charging 2:");
+        //         break;
+        //     case 7:
+        //         printf("charging 3:");
+        //         break;
+        //     case 8:
+        //         printf("charged 0:");
+        //         break;
+        //     case 9:
+        //         printf("charged 1:");
+        //         break;
+        //     case 10:
+        //         printf("charged 2:");
+        //         break;
+        //     case 11:
+        //         printf("charged 3:");
+        //         break;
+        //     case 12:
+        //         printf("charged Sum:");
+        //         break;
+        //     case 13:
+        //         printf("flashing:");
+        //         break;
+        //     default:
+        //         printf("unknown state:");
+        //         break;
+        //     }
+        //     for (size_t j = 0; j < places[i]->tokenCount; j++)
+        //     {
+
+        //         printf(" token number :%d value: %f", j, places[i]->tokens[j]);
+        //     }
+        //     printf("\n");
+        // }
+        // if ((places[4]->tokenCount + places[5]->tokenCount +
+        //          places[6]->tokenCount + places[7]->tokenCount >=
+        //      1) &&
+        //     places[13]->tokenCount == 1 &&
+        //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
+        //     places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+
+        // if ((places[4]->tokenCount + places[5]->tokenCount +
+        //          places[6]->tokenCount + places[7]->tokenCount ==
+        //      1) &&
+        //     places[13]->tokenCount == 1 &&
+        //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
+        //     places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+
+        if (places[4]->tokenCount == 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
+            places[13]->tokenCount == 1 &&
+            places[0]->tokenCount == 0 && places[1]->tokenCount == 0 && places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+
+        {
+            *success = true;
+            // printf("_______________________________________________SUCCESS__________________________");
+            return;
+        }
+
+        if (currentTime < 31)
+        {
+            step(&result);
+        }
+        else
+        {
+
+            *success = false;
+            return;
+        }
+    }
 }
 
 __device__ void Tapn::shouldContinue(bool *result)
@@ -166,18 +273,16 @@ __device__ void Tapn::updateTokenAges(float *delay)
     {
         for (size_t j = 0; j < places[i]->tokenCount; j++)
         {
-            //printf("\ntoken before%f\n",places[i]->tokens[j]);
             places[i]->tokens[j] += *delay;
-            //printf("\ntoken after%f\n",places[i]->tokens[j]);
         }
     }
 }
 
 __device__ void Tapn::updateEnabledTransitions()
 {
+    bool ready{true};
     for (size_t i = 0; i < transitionsCount; i++)
     {
-        bool ready;
         transitions[i]->isReady(&ready);
     }
 }
