@@ -22,7 +22,8 @@ struct Tapn
     __device__ void step(bool *result);
     __device__ void fireTransition(size_t index, bool *result);
     __device__ void firingCount(int index, int *result);
-    __device__ void run(bool *success);
+    __device__ void run();
+    __device__ void run2(bool *success);
     __device__ void shouldContinue(bool *result);
     __device__ void delay();
     __device__ void updateTokenAges(float *delay);

@@ -48,8 +48,8 @@ __device__ void Tapn::step(bool *result)
         int transitionIndex = enabled[i].index;
         if (transitions[transitionIndex]->urgent)
         {
-            urgentTransitionIndex = transitionIndex; // Store actual transition index
-            break;                                   // Stop at first urgent transition found
+            urgentTransitionIndex = transitionIndex;
+            break;
         }
     }
 
@@ -114,7 +114,7 @@ __device__ void Tapn::firingCount(int index, int *result)
     *result = transitionFirings[index];
 }
 
-__device__ void Tapn::run(bool *success)
+__device__ void Tapn::run()
 {
     bool result;
     shouldContinue(&result);
@@ -133,9 +133,54 @@ __device__ void Tapn::run(bool *success)
     // }
     while (result)
     {
-        if (places[4]->tokenCount = 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
+        step(&result);
+        if (steps >= 30)
+        {
+            return;
+        }
+    }
+    // for (size_t i = 0; i < observersCount; i++)
+    // {
+    //     observers[i].onCompletion();
+    // }
+}
+__device__ void Tapn::run2(bool *success)
+{
+    bool result;
+    shouldContinue(&result);
+    // for (size_t i = 0; i < count; i++)
+    // {
+    //     /* code */
+    // }
+    // for (size_t i = 0; i < 5; i++)
+    // {
+    //     step(&result);
+    // }
+    // printf("First sanity check - place pointers:\n");
+    // for (size_t i = 0; i < placesCount; i++) {
+    //     printf("Place %zu pointer: %p, token count: %d \n",
+    //            i, places[i], places[i]->tokenCount);
+    // }
+    while (result)
+    {
+        // if ((places[4]->tokenCount + places[5]->tokenCount +
+        //          places[6]->tokenCount + places[7]->tokenCount >=
+        //      1) &&
+        //     places[13]->tokenCount == 1 &&
+        //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
+        //     places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+
+        // if ((places[4]->tokenCount + places[5]->tokenCount +
+        //          places[6]->tokenCount + places[7]->tokenCount ==
+        //      1) &&
+        //     places[13]->tokenCount == 1 &&
+        //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
+        //     places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+
+        if (places[4]->tokenCount == 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
             places[13]->tokenCount == 1 &&
             places[0]->tokenCount == 0 && places[1]->tokenCount == 0 && places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+
         {
             *success = true;
             // printf("_______________________________________________SUCCESS__________________________");
@@ -151,7 +196,7 @@ __device__ void Tapn::run(bool *success)
         // }
 
         step(&result);
-        if (steps >= 30)
+        if (currentTime >= 60)
         {
             *success = false;
             return;

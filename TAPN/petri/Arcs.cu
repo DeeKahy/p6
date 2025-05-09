@@ -55,8 +55,8 @@ __device__ void Arc::canFire(bool *result)
         break;
     case INHIBITOR:
         tokensOk = (place->tokenCount < constraint);
-        place->invariantHold(weight, &invariantsOk);
-        *result = tokensOk && invariantsOk;
+        // place->invariantHold(weight, &invariantsOk);
+        *result = tokensOk;  //&& invariantsOk;
         break;
     default:
         // //printf("test");
@@ -119,6 +119,7 @@ __device__ void Arc::inputFire(float *outputTokens, int *outputCount)
         {
             *outputCount = 0;
         }
+        *outputCount = count;
         delete[] dummy;
     }
     else

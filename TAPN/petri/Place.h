@@ -6,7 +6,7 @@ struct Place
 {
     int id;
     int tokenCount{0};
-    float tokens[20] {FLT_MAX};
+    float tokens[8] {FLT_MAX};
     
     Invariant *invariant{nullptr};
     int invariantCount{0};

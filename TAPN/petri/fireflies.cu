@@ -1,15 +1,16 @@
 #include "fireflies.h"
 
 // Helper function to check CUDA errors
-#define checkCudaErrors(call) { \
-    cudaError_t err = call; \
-    if (err != cudaSuccess) { \
-        std::cerr << "CUDA error in " << __FILE__ << " at line " << __LINE__ << ": " \
-                 << cudaGetErrorString(err) << std::endl; \
-        exit(EXIT_FAILURE); \
-    } \
-}
-
+#define checkCudaErrors(call)                                                            \
+    {                                                                                    \
+        cudaError_t err = call;                                                          \
+        if (err != cudaSuccess)                                                          \
+        {                                                                                \
+            std::cerr << "CUDA error in " << __FILE__ << " at line " << __LINE__ << ": " \
+                      << cudaGetErrorString(err) << std::endl;                           \
+            exit(EXIT_FAILURE);                                                          \
+        }                                                                                \
+    }
 
 __global__ void fireflies(float *results)
 {
@@ -18,7 +19,7 @@ __global__ void fireflies(float *results)
     Tapn net;
 
     float token = 0.0f;
-    float tokens[1] {token};
+    float tokens[1]{token};
     // starting transitions transitions
     // printf("waiting and tokens");
     Place waiting0;
@@ -185,6 +186,13 @@ __global__ void fireflies(float *results)
     aReady3.outputArcs[1] = &oChargedSum;
     aReady3.outputArcsCount++;
     Place flashing;
+
+    Arc fliss;
+    fliss.place = &flashing;
+    fliss.type = INPUT;
+    fliss.timings[0] = 0.0f;
+    fliss.timings[1] = FLT_MAX;
+
     Arc aChargedSum;
     aChargedSum.place = &chargedSum;
     aChargedSum.type = INPUT;
@@ -315,21 +323,20 @@ __global__ void fireflies(float *results)
     dis4.type = CONSTANT;
     dis4.a = 0.0f;
 
-
-    Place noWhere;
-    OutputArc oNoWhere;
-    oNoWhere.isTransport = false;
-    oNoWhere.output = &noWhere;
-
+    // Place noWhere;
+    // OutputArc oNoWhere;
+    // oNoWhere.isTransport = false;
+    // oNoWhere.output = &noWhere;
 
     Transition tAllDone;
+    tAllDone.urgent = true;
     tAllDone.distribution = &dis4;
     tAllDone.inputArcs[0] = &aAllDone0;
     tAllDone.inputArcsCount++;
     tAllDone.inputArcs[1] = &aAllDone1;
     tAllDone.inputArcsCount++;
-    tAllDone.outputArcs[0] = &oNoWhere;
-    tAllDone.outputArcsCount++;
+    // tAllDone.outputArcs[0] = &oNoWhere;
+    // tAllDone.outputArcsCount++;
     Arc flashJointly0;
     flashJointly0.place = &charged0;
     flashJointly0.type = INPUT;
@@ -358,6 +365,8 @@ __global__ void fireflies(float *results)
     tFlashJointly0.inputArcsCount++;
     tFlashJointly0.inputArcs[1] = &aChargedSum;
     tFlashJointly0.inputArcsCount++;
+    tFlashJointly0.inputArcs[2] = &fliss;
+    tFlashJointly0.inputArcsCount++;
     tFlashJointly0.outputArcs[0] = &oFlashing;
     tFlashJointly0.outputArcsCount++;
     tFlashJointly0.outputArcs[1] = &oArrive0;
@@ -369,6 +378,8 @@ __global__ void fireflies(float *results)
     tFlashJointly1.inputArcs[0] = &flashJointly1;
     tFlashJointly1.inputArcsCount++;
     tFlashJointly1.inputArcs[1] = &aChargedSum;
+    tFlashJointly1.inputArcsCount++;
+    tFlashJointly1.inputArcs[2] = &fliss;
     tFlashJointly1.inputArcsCount++;
     tFlashJointly1.outputArcs[0] = &oFlashing;
     tFlashJointly1.outputArcsCount++;
@@ -382,6 +393,8 @@ __global__ void fireflies(float *results)
     tFlashJointly2.inputArcsCount++;
     tFlashJointly2.inputArcs[1] = &aChargedSum;
     tFlashJointly2.inputArcsCount++;
+    tFlashJointly2.inputArcs[2] = &fliss;
+    tFlashJointly2.inputArcsCount++;
     tFlashJointly2.outputArcs[0] = &oFlashing;
     tFlashJointly2.outputArcsCount++;
     tFlashJointly2.outputArcs[1] = &oArrive2;
@@ -394,42 +407,44 @@ __global__ void fireflies(float *results)
     tFlashJointly3.inputArcsCount++;
     tFlashJointly3.inputArcs[1] = &aChargedSum;
     tFlashJointly3.inputArcsCount++;
+    tFlashJointly3.inputArcs[2] = &fliss;
+    tFlashJointly3.inputArcsCount++;
     tFlashJointly3.outputArcs[0] = &oFlashing;
     tFlashJointly3.outputArcsCount++;
     tFlashJointly3.outputArcs[1] = &oArrive3;
     tFlashJointly3.outputArcsCount++;
 
-    Place *places[14]{&waiting0, &waiting1, &waiting2, &waiting3, &charging0, &charging1, &charging2, &charging3, &charged0,&charged1,&charged2,&charged3, &chargedSum, &flashing};
+    Place *places[14]{&waiting0, &waiting1, &waiting2, &waiting3, &charging0, &charging1, &charging2, &charging3, &charged0, &charged1, &charged2, &charged3, &chargedSum, &flashing};
     net.places = places;
     net.placesCount = 14;
 
-    Transition *transitions[17]{&aArrive0, &aArrive1, &aArrive2, &aArrive3, &aReady0, &aReady1, &aReady2, &aReady3, &aFlashing0, &aFlashing1, &aFlashing2, &aFlashing3, &tAllDone, &tFlashJointly0, &tFlashJointly1, &tFlashJointly2, &tFlashJointly3};
+    Transition *transitions[17]{&tAllDone, &aArrive0, &aArrive1, &aArrive2, &aArrive3, &aReady0, &aReady1, &aReady2, &aReady3, &aFlashing0, &aFlashing1, &aFlashing2, &aFlashing3, &tFlashJointly0, &tFlashJointly1, &tFlashJointly2, &tFlashJointly3};
     net.transitions = transitions;
     net.transitionsCount = 17;
 
     // TokenCountObserver observer;
     // net.addObserver(&observer);
-    bool success {false};
-    net.run(&success);
+    bool success{false};
+    net.run2(&success);
     results[tid] += success;
 }
 __global__ void sum(float *array, int numSimulations)
 {
     float total = 0.0f;
-    for (int i = 0; i < 64 ; i++)
+    for (int i = 0; i < 256; i++)
     {
         total += array[i];
     }
-    printf("euler value is %.11f\n", (double)total / numSimulations);
+    printf("success rate is %.11f\n", (double)total / numSimulations);
 }
 __global__ void summage(float *array, int numSimulations)
 {
     int tid = threadIdx.x;
     float sum = 0.0f;
 
-    for (int i = 0; i < numSimulations / 64 ; i++)
+    for (int i = 0; i < numSimulations / 256; i++)
     {
-        sum += array[tid + i * 64 ];
+        sum += array[tid + i * 256];
     }
 
     array[tid] = sum;
@@ -440,8 +455,8 @@ int main(int argc, char *argv[])
     auto start = std::chrono::high_resolution_clock::now();
     float confidence;
     float error;
-    int threads = 64;
-    int blockCount = 512;
+    int threads = 256;
+    int blockCount = 68;
     if (argc < 3)
     {
         confidence = 0.95f;
@@ -466,7 +481,7 @@ int main(int argc, char *argv[])
 
     for (size_t i = 0; i < loopCount; i++)
     {
-        fireflies<<<1, threads>>>(d_results);
+        fireflies<<<blockCount, threads>>>(d_results);
         checkCudaErrors(cudaDeviceSynchronize());
     }
     summage<<<1, threads>>>(d_results, blockCount * threads);
