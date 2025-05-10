@@ -251,7 +251,8 @@ __global__ void fireflies(float *results)
 
     Distribution dis3;
     dis3.type = EXPONENTIAL;
-    dis3.a = 0.5f;
+    dis3.a = 0.1f;
+    dis3.init();
 
     Transition aFlashing0;
     aFlashing0.distribution = &dis3;

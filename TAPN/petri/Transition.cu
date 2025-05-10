@@ -118,7 +118,7 @@ __device__ void Distribution::sample(float *result)
         ;
         break;
     case EXPONENTIAL:
-        *result = expf(a);
+        *result = -logf(curand_uniform(&state)) / a;
         break; // more distributions to come
     }
 }

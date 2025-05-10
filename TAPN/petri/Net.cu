@@ -92,8 +92,7 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     event.firing = {(int)index, firingTime};
     SimulationEvent preEvent = event;
     notify_observers(&preEvent);
-
-    currentTime += firingTime;
+    // currentTime += firingTime;
     float consumed[8]{FLT_MAX};
     int consumedCount{8};
     int consumedAmount;
@@ -214,16 +213,16 @@ __device__ void Tapn::run2(bool *success)
         //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
         //     places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
 
-        // if ((places[4]->tokenCount + places[5]->tokenCount +
-        //          places[6]->tokenCount + places[7]->tokenCount ==
-        //      1) &&
-        //     places[13]->tokenCount == 1 &&
-        //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
-        //     places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
-
-        if (places[4]->tokenCount == 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
+        if ((places[4]->tokenCount + places[5]->tokenCount +
+                 places[6]->tokenCount + places[7]->tokenCount ==
+             1) &&
             places[13]->tokenCount == 1 &&
-            places[0]->tokenCount == 0 && places[1]->tokenCount == 0 && places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+            places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
+            places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+
+        // if (places[4]->tokenCount == 1 && places[5]->tokenCount == 1 && places[6]->tokenCount == 1 && places[7]->tokenCount == 1 &&
+        //     places[13]->tokenCount == 1 &&
+        //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 && places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
 
         {
             *success = true;
@@ -231,7 +230,7 @@ __device__ void Tapn::run2(bool *success)
             return;
         }
 
-        if (currentTime < 31)
+        if (currentTime <= 30)
         {
             step(&result);
         }
