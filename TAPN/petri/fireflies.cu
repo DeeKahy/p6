@@ -459,7 +459,7 @@ int main(int argc, char *argv[])
     float confidence;
     float error;
     int threads = 256;
-    int blockCount = 68;
+    int blockCount = 512;
     if (argc < 3)
     {
         confidence = 0.95f;
@@ -473,8 +473,8 @@ int main(int argc, char *argv[])
     std::cout << "confidence: " << confidence << " error: " << error << std::endl;
     float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
     std::cout << "number of executions: " << number << std::endl;
-    int executionCount = ceil(number / threads);
-    int loopCount = ceil(executionCount / blockCount);
+    int loopCount = ceil(number / (blockCount *threads));
+    // int loopCount = ceil(executionCount / blockCount);
     std::cout << "loop count: " << loopCount << std::endl;
     std::cout << "number of executions: " << loopCount * blockCount * threads << std::endl;
     float *d_results;
