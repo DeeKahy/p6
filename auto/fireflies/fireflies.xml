@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+        <namedsort id="fireflies" name="fireflies">
+          <finiteintrange end="4" start="1"/>
+        </namedsort>
+        <variabledecl id="x" name="x">
+          <usersort declaration="fireflies"/>
+        </variabledecl>
+        <variabledecl id="y" name="y">
+          <usersort declaration="fireflies"/>
+        </variabledecl>
+      </declarations>
+    </structure>
+  </declaration>
+  <net active="true" id="ComposedModel" type="P/T net">
+    <place displayName="true" id="net_waiting" initialMarking="4" invariant="&lt; inf" name="net_waiting" nameOffsetX="0" nameOffsetY="-3" positionX="165" positionY="105">
+      <type>
+        <text>fireflies</text>
+        <structure>
+          <usersort declaration="fireflies"/>
+        </structure>
+      </type>
+      <hlinitialMarking>
+        <text>1'fireflies.all</text>
+        <structure>
+          <add>
+            <subterm>
+              <numberof>
+                <subterm>
+                  <numberconstant value="1">
+                    <positive/>
+                  </numberconstant>
+                </subterm>
+                <subterm>
+                  <all>
+                    <usersort declaration="fireflies"/>
+                  </all>
+                </subterm>
+              </numberof>
+            </subterm>
+          </add>
+        </structure>
+      </hlinitialMarking>
+    </place>
+    <place displayName="true" id="net_charging" initialMarking="0" invariant="&lt; inf" name="net_charging" nameOffsetX="68" nameOffsetY="-22" positionX="285" positionY="210">
+      <type>
+        <text>fireflies</text>
+        <structure>
+          <usersort declaration="fireflies"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="net_charged" initialMarking="0" invariant="&lt; inf" name="net_charged" nameOffsetX="12" nameOffsetY="-16" positionX="525" positionY="210">
+      <type>
+        <text>fireflies</text>
+        <structure>
+          <usersort declaration="fireflies"/>
+        </structure>
+      </type>
+    </place>
+    <place displayName="true" id="net_flashing" initialMarking="0" invariant="&lt; inf" name="net_flashing" nameOffsetX="69" nameOffsetY="-6" positionX="765" positionY="210">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+    <transition a="0.0" angle="0" b="10.0" displayName="true" distribution="uniform" firingMode="Random" id="net_arrive" infiniteServer="false" name="net_arrive" nameOffsetX="51" nameOffsetY="39" player="0" positionX="165" positionY="210" priority="0" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="normal" firingMode="Random" id="net_ready" infiniteServer="false" mean="2.0" name="net_ready" nameOffsetX="62" nameOffsetY="46" player="0" positionX="405" positionY="210" priority="0" stddev="0.5" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="exponential" firingMode="Random" id="net_flash_alone" infiniteServer="false" name="net_flash_alone" nameOffsetX="126" nameOffsetY="-20" player="0" positionX="630" positionY="90" priority="0" rate="0.1" urgent="false" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Random" id="net_flash_jointly" infiniteServer="false" name="net_flash_jointly" nameOffsetX="66" nameOffsetY="55" player="0" positionX="525" positionY="300" priority="0" urgent="true" value="0.0" weight="1.0"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Random" id="net_all_done" infiniteServer="false" name="net_all_done" nameOffsetX="50" nameOffsetY="-21" player="0" positionX="645" positionY="210" priority="0" urgent="true" value="0.0" weight="1.0"/>
+    <arc id="net_waiting_to_net_arrive" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="net_waiting" target="net_arrive" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="180" yCoord="135"/>
+      <arcpath arcPointType="false" id="1" xCoord="180" yCoord="210"/>
+    </arc>
+    <arc id="net_charging_to_net_ready" inscription="[1,inf)" nameOffsetX="0" nameOffsetY="0" source="net_charging" target="net_ready" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="315" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="415" yCoord="226"/>
+    </arc>
+    <arc id="net_charged_to_net_flash_alone" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="net_charged" target="net_flash_alone" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="550" yCoord="214"/>
+      <arcpath arcPointType="false" id="1" xCoord="640" yCoord="111"/>
+    </arc>
+    <arc id="net_charged_to_net_flash_jointly" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="net_charged" target="net_flash_jointly" type="timed" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="540" yCoord="240"/>
+      <arcpath arcPointType="false" id="1" xCoord="540" yCoord="300"/>
+    </arc>
+    <arc id="net_flashing_to_net_flash_jointly" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="net_flashing" target="net_flash_jointly" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="777" yCoord="240"/>
+      <arcpath arcPointType="true" id="1" xCoord="735" yCoord="315"/>
+      <arcpath arcPointType="false" id="2" xCoord="545" yCoord="320"/>
+    </arc>
+    <arc id="net_flashing_to_net_all_done" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="net_flashing" target="net_all_done" type="timed" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="765" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="665" yCoord="225"/>
+    </arc>
+    <arc id="net_arrive_to_net_charging" inscription="1" nameOffsetX="0" nameOffsetY="0" source="net_arrive" target="net_charging" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="185" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="285" yCoord="226"/>
+    </arc>
+    <arc id="net_ready_to_net_charged" inscription="1" nameOffsetX="0" nameOffsetY="0" source="net_ready" target="net_charged" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="425" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="525" yCoord="226"/>
+    </arc>
+    <arc id="net_flash_alone_to_net_flashing" inscription="1" nameOffsetX="0" nameOffsetY="0" source="net_flash_alone" target="net_flashing" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="650" yCoord="110"/>
+      <arcpath arcPointType="false" id="1" xCoord="769" yCoord="214"/>
+    </arc>
+    <arc id="net_flash_alone_to_net_charging" inscription="1" nameOffsetX="0" nameOffsetY="0" source="net_flash_alone" target="net_charging" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="640" yCoord="101"/>
+      <arcpath arcPointType="true" id="1" xCoord="300" yCoord="195"/>
+      <arcpath arcPointType="false" id="2" xCoord="307" yCoord="212"/>
+    </arc>
+    <arc id="net_flash_jointly_to_net_flashing" inscription="1" nameOffsetX="0" nameOffsetY="0" source="net_flash_jointly" target="net_flashing" type="normal" weight="1">
+      <hlinscription>
+        <text>1'dot</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <useroperator declaration="dot"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="545" yCoord="310"/>
+      <arcpath arcPointType="false" id="1" xCoord="766" yCoord="231"/>
+    </arc>
+    <arc id="net_flash_jointly_to_net_charging" inscription="1" nameOffsetX="0" nameOffsetY="0" source="net_flash_jointly" target="net_charging" type="normal" weight="1">
+      <hlinscription>
+        <text>1'x</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <variable refvariable="x"/>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="535" yCoord="316"/>
+      <arcpath arcPointType="true" id="1" xCoord="300" yCoord="255"/>
+      <arcpath arcPointType="false" id="2" xCoord="304" yCoord="239"/>
+    </arc>
+    <arc id="net_charged_to_net_all_done" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="net_charged" target="net_all_done" type="tapnInhibitor" weight="1">
+      <hlinscription>
+        <text>1'fireflies.all</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <all>
+                <usersort declaration="fireflies"/>
+              </all>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="555" yCoord="225"/>
+      <arcpath arcPointType="false" id="1" xCoord="655" yCoord="226"/>
+    </arc>
+    <arc id="net_flashing_to_net_flash_alone" inscription="[0,inf)" nameOffsetX="0" nameOffsetY="0" source="net_flashing" target="net_flash_alone" type="tapnInhibitor" weight="1">
+      <hlinscription>
+        <text>1'dot.all</text>
+        <structure>
+          <numberof>
+            <subterm>
+              <numberconstant value="1">
+                <positive/>
+              </numberconstant>
+            </subterm>
+            <subterm>
+              <all>
+                <usersort declaration="dot"/>
+              </all>
+            </subterm>
+          </numberof>
+        </structure>
+      </hlinscription>
+      <arcpath arcPointType="false" id="0" xCoord="779" yCoord="210"/>
+      <arcpath arcPointType="true" id="1" xCoord="735" yCoord="105"/>
+      <arcpath arcPointType="false" id="2" xCoord="650" yCoord="100"/>
+    </arc>
+  </net>
+  <feature isColored="true" isGame="true" isStochastic="false" isTimed="true"/>
+</pnml>
