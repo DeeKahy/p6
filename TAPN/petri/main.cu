@@ -6,7 +6,8 @@ __global__ void euler(float *results)
     Tapn net;
     Place place1;
     float token = 0.0f;
-    place1.addTokens(&token, 1);
+    float tokens[1]{token};
+    place1.addTokens(tokens, 1);
     Place place2;
 
     Arc arc1;
@@ -66,8 +67,7 @@ __global__ void euler(float *results)
     // net.addObserver(&tokenAgeObs);
     // TokenCountObserver tokenCountObs;
     // net.addObserver(&tokenCountObs);
-    bool test {false};
-    net.run2(&test);
+    net.run();
     results[tid] += net.steps - 1;
     // net.step(&test);
     // //printf("\n place 0 %f\n", place1.tokens[0]);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     if (argc < 3)
     {
         confidence = 0.95f;
-        error = 0.0008f;
+        error = 0.005f;
     }
     else
     {
@@ -124,9 +124,9 @@ int main(int argc, char *argv[])
 
     cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float));
     cudaMemset((void **)&d_results, 0, blockCount * threads * sizeof(float));
-    for (size_t i = 0; i < loopCount; i++)
+    for (size_t i = 0; i < 1; i++)
     {
-        euler<<<blockCount, threads>>>(d_results);
+        euler<<<1, 1>>>(d_results);
         cudaDeviceSynchronize();
     }
 

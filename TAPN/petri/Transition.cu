@@ -6,7 +6,7 @@
  * @param result a pointer to a bool to indicate if it is ready
  * @return bool
  */
-__device__ void Transition::isReady(bool *result)
+__device__ void Transition::isReady(bool *result, float *missing)
 {
     // //printf("%d",inputArcsCount);
     for (size_t i = 0; i < inputArcsCount; i++)
@@ -14,7 +14,7 @@ __device__ void Transition::isReady(bool *result)
 
         // Check if transition can fire
         bool transitionCanFire = false;
-        inputArcs[i]->canFire(&transitionCanFire);
+        inputArcs[i]->canFire(&transitionCanFire, missing);
 
         if (!transitionCanFire)
         {

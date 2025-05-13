@@ -34,7 +34,7 @@ struct Transition
     int id;
     
     __device__ void fire(float *consumed, int consumedCount, int *consumedAmout);
-    __device__ void isReady(bool *result);
+    __device__ void isReady(bool *result,float* missing);
 
 };
 

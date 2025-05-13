@@ -21,11 +21,11 @@ __device__ void Tapn::step(bool *result)
 
     EnabledTransition *enabled = new EnabledTransition[transitionsCount];
     int enabledCount = 0;
-
+    float missing{FLT_MAX};
     for (int i = 0; i < transitionsCount; i++)
     {
         bool isReady = true;
-        transitions[i]->isReady(&isReady);
+        transitions[i]->isReady(&isReady, &missing);
         if (isReady)
         {
             enabled[enabledCount] = {i, transitions[i]->firingTime};
@@ -34,19 +34,16 @@ __device__ void Tapn::step(bool *result)
     }
     if (enabledCount == 0)
     {
-        float ageIncrease{1.0f};
-        updateTokenAges(&ageIncrease);
-        failedAttempt++;
-        steps++;
-        delete[] enabled;
-        if (failedAttempt >= 10)
+        if (missing != FLT_MAX)
         {
-            *result = false;
+            updateTokenAges(&missing);
+            steps++;
         }
         else
         {
-            *result = true;
+            *result = false;
         }
+        delete[] enabled;
         return;
     }
 
@@ -79,6 +76,7 @@ __device__ void Tapn::step(bool *result)
     }
 
     bool success = false;
+    transportUpdate = lowestFiringTime.firingTime;
     fireTransition(lowestFiringTime.index, &success);
     delete[] enabled;
 }
@@ -92,15 +90,14 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     event.firing = {(int)index, firingTime};
     SimulationEvent preEvent = event;
     notify_observers(&preEvent);
-    // currentTime += firingTime;
+    transportUpdate += firingTime;
     float consumed[8]{FLT_MAX};
     int consumedCount{8};
     int consumedAmount;
     transitions[index]->fire(consumed, consumedCount, &consumedAmount);
-
+    
     transitionFirings[index]++;
     steps++;
-
 
     *result = true;
 }
@@ -124,6 +121,16 @@ __device__ void Tapn::run()
     while (result)
     {
         step(&result);
+        for (size_t i = 0; i < placesCount; i++)
+        {
+            printf("place %d", i);
+            for (size_t j = 0; j < places[i]->tokenCount; j++)
+            {
+
+                printf(" token number :%d value: %f", j, places[i]->tokens[j]);
+            }
+            printf("\n");
+        }
         if (steps >= 30)
         {
             return;
@@ -279,9 +286,10 @@ __device__ void Tapn::updateTokenAges(float *delay)
 
 __device__ void Tapn::updateEnabledTransitions()
 {
+    float missing{0};
     bool ready{true};
     for (size_t i = 0; i < transitionsCount; i++)
     {
-        transitions[i]->isReady(&ready);
+        transitions[i]->isReady(&ready, &missing);
     }
 }
