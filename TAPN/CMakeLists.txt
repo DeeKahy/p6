@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_CUDA_ARCHITECTURES 61 75 86 89)  # change depending on your GPU
 
 # Add the executable with .cu files
-add_executable( TAPN    petri/main.cu
+add_executable( TAPN    petri/fireflies.cu
                         petri/Arcs.cu
                         petri/Invariant.cu
                         petri/Net.cu

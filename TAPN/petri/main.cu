@@ -77,17 +77,18 @@ __global__ void euler(float *results)
 
 __global__ void sum(float *array, int numSimulations)
 {
-    float total = 0.0f;
+    double total = 0.0;
     for (int i = 0; i < 512; i++)
     {
         total += array[i];
     }
     printf("euler value is %.11f\n", (double)total / numSimulations);
+    printf("real euler is 2.71828");
 }
 __global__ void summage(float *array, int numSimulations)
 {
     int tid = threadIdx.x;
-    float sum = 0.0f;
+    double sum = 0.0;
 
     for (int i = 0; i < numSimulations / 512; i++)
     {
@@ -106,27 +107,27 @@ int main(int argc, char *argv[])
     if (argc < 3)
     {
         confidence = 0.95f;
-        error = 0.005f;
+        error = 0.0005f;
     }
     else
     {
         confidence = std::stof(argv[1]);
         error = std::stof(argv[2]);
     }
-    std::cout << "confidence: " << confidence << " error: " << error << std::endl;
+std::cout << "confidence: " << confidence << " error: " << error << std::endl;
     float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
     std::cout << "number of executions: " << number << std::endl;
-    int executionCount = ceil(number / threads);
-    int loopCount = ceil(executionCount / blockCount);
-    std::cout << "number of executions: " << executionCount << std::endl;
+    int loopCount = ceil(number / (blockCount *threads));
+    // int loopCount = ceil(executionCount / blockCount);
+    std::cout << "loop count: " << loopCount << std::endl;
     std::cout << "number of executions: " << loopCount * blockCount * threads << std::endl;
     float *d_results;
 
     cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float));
     cudaMemset((void **)&d_results, 0, blockCount * threads * sizeof(float));
-    for (size_t i = 0; i < 1; i++)
+    for (size_t i = 0; i < loopCount; i++)
     {
-        euler<<<1, 1>>>(d_results);
+        euler<<<blockCount, threads>>>(d_results);
         cudaDeviceSynchronize();
     }
 

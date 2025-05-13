@@ -76,7 +76,6 @@ __device__ void Tapn::step(bool *result)
     }
 
     bool success = false;
-    transportUpdate = lowestFiringTime.firingTime;
     fireTransition(lowestFiringTime.index, &success);
     delete[] enabled;
 }
@@ -90,7 +89,7 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     event.firing = {(int)index, firingTime};
     SimulationEvent preEvent = event;
     notify_observers(&preEvent);
-    transportUpdate += firingTime;
+    // currentTime += firingTime;
     float consumed[8]{FLT_MAX};
     int consumedCount{8};
     int consumedAmount;
@@ -121,16 +120,16 @@ __device__ void Tapn::run()
     while (result)
     {
         step(&result);
-        for (size_t i = 0; i < placesCount; i++)
-        {
-            printf("place %d", i);
-            for (size_t j = 0; j < places[i]->tokenCount; j++)
-            {
+        // for (size_t i = 0; i < placesCount; i++)
+        // {
+        //     printf("place %d", i);
+        //     for (size_t j = 0; j < places[i]->tokenCount; j++)
+        //     {
 
-                printf(" token number :%d value: %f", j, places[i]->tokens[j]);
-            }
-            printf("\n");
-        }
+        //         printf(" token number :%d value: %f", j, places[i]->tokens[j]);
+        //     }
+        //     printf("\n");
+        // }
         if (steps >= 30)
         {
             return;
@@ -237,7 +236,7 @@ __device__ void Tapn::run2(bool *success)
             return;
         }
 
-        if (currentTime <= 30)
+        if (currentTime < 30)
         {
             step(&result);
         }
