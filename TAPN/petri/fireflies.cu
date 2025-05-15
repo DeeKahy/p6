@@ -432,18 +432,18 @@ __global__ void fireflies(float *results)
 }
 __global__ void sum(float *array, int numSimulations, int totalThreads)
 {
-    float total = 0.0f;
+    double total = 0;
 
     for (int i = 0; i < totalThreads; i++)
     {
         total += array[i];
     }
-    printf("success rate is %.11f\n", (double)total / numSimulations);
+    printf("success rate is %.11f\n", total / numSimulations);
 }
 __global__ void summage(float *array, int numSimulations, int totalThreads)
 {
     int tid = threadIdx.x;
-    float sum = 0.0f;
+    double sum = 0;
 
     for (int i = 0; i < numSimulations / totalThreads; i++)
     {

@@ -77,19 +77,19 @@ __global__ void euler(float *results)
 
 __global__ void sum(float *array, int numSimulations, int totalThreads)
 {
-    float total = 0.0f;
+    double total = 0.0f;
 
     for (int i = 0; i < totalThreads; i++)
     {
         total += array[i];
     }
-    printf("euler value is %.11f\n", (double)total / numSimulations);
+    printf("euler value is %.11f\n", total / numSimulations);
     printf("real euler is 2.71828\n");
 }
 __global__ void summage(float *array, int numSimulations, int totalThreads)
 {
     int tid = threadIdx.x;
-    float sum = 0.0f;
+    double sum = 0.0f;
 
     for (int i = 0; i < numSimulations / totalThreads; i++)
     {
