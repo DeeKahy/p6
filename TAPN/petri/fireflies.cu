@@ -463,7 +463,7 @@ int main(int argc, char *argv[])
     if (argc < 3)
     {
         confidence = 0.95f;
-        error = 0.0005f;
+        error = 0.005f;
     }
     else
     {
@@ -474,15 +474,11 @@ int main(int argc, char *argv[])
     float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
     std::cout << "number of executions: " << number << std::endl;
     int loopCount = ceil(number / (blockCount *threads));
-    // int loopCount = ceil(executionCount / blockCount);
     std::cout << "loop count: " << loopCount << std::endl;
     std::cout << "number of executions: " << loopCount * blockCount * threads << std::endl;
     float *d_results;
-    // float *d_lenght;
     checkCudaErrors(cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float)));
     checkCudaErrors(cudaMemset(d_results, 0, blockCount * threads * sizeof(float)));
-    // checkCudaErrors(cudaMalloc((void **)&d_lenght, blockCount * threads * sizeof(float)));
-    // checkCudaErrors(cudaMemset(d_lenght, 0, blockCount * threads * sizeof(float)));
     for (size_t i = 0; i < loopCount; i++)
     {
         fireflies<<<blockCount, threads>>>(d_results);
@@ -492,10 +488,6 @@ int main(int argc, char *argv[])
     cudaDeviceSynchronize();
     sum<<<1, 1>>>(d_results, loopCount * blockCount * threads, threads);
     cudaDeviceSynchronize();
-    // summage<<<1, threads>>>(d_lenght, blockCount * threads, threads);
-    // cudaDeviceSynchronize();
-    // sum<<<1, 1>>>(d_lenght, loopCount * blockCount * threads, threads);
-    // cudaDeviceSynchronize();
     cudaError_t errSync = cudaDeviceSynchronize();
     cudaError_t errAsync = cudaGetLastError();
 

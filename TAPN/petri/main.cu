@@ -75,24 +75,25 @@ __global__ void euler(float *results)
     // net.step(&test);
 }
 
-__global__ void sum(float *array, int numSimulations)
+__global__ void sum(float *array, int numSimulations, int totalThreads)
 {
-    double total = 0.0;
-    for (int i = 0; i < 512; i++)
+    float total = 0.0f;
+
+    for (int i = 0; i < totalThreads; i++)
     {
         total += array[i];
     }
     printf("euler value is %.11f\n", (double)total / numSimulations);
     printf("real euler is 2.71828");
 }
-__global__ void summage(float *array, int numSimulations)
+__global__ void summage(float *array, int numSimulations, int totalThreads)
 {
     int tid = threadIdx.x;
-    double sum = 0.0;
+    float sum = 0.0f;
 
-    for (int i = 0; i < numSimulations / 512; i++)
+    for (int i = 0; i < numSimulations / totalThreads; i++)
     {
-        sum += array[tid + i * 512];
+        sum += array[tid + i * totalThreads];
     }
 
     array[tid] = sum;
@@ -114,11 +115,10 @@ int main(int argc, char *argv[])
         confidence = std::stof(argv[1]);
         error = std::stof(argv[2]);
     }
-std::cout << "confidence: " << confidence << " error: " << error << std::endl;
+    std::cout << "confidence: " << confidence << " error: " << error << std::endl;
     float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
     std::cout << "number of executions: " << number << std::endl;
-    int loopCount = ceil(number / (blockCount *threads));
-    // int loopCount = ceil(executionCount / blockCount);
+    int loopCount = ceil(number / (blockCount * threads));
     std::cout << "loop count: " << loopCount << std::endl;
     std::cout << "number of executions: " << loopCount * blockCount * threads << std::endl;
     float *d_results;
@@ -131,20 +131,20 @@ std::cout << "confidence: " << confidence << " error: " << error << std::endl;
         cudaDeviceSynchronize();
     }
 
-    summage<<<1, threads>>>(d_results, blockCount * threads);
+    summage<<<1, threads>>>(d_results, blockCount * threads, threads);
     cudaDeviceSynchronize();
-    sum<<<1, 1>>>(d_results, loopCount * blockCount * threads);
+    sum<<<1, 1>>>(d_results, loopCount * blockCount * threads, threads);
     cudaDeviceSynchronize();
     cudaError_t errSync = cudaDeviceSynchronize();
     cudaError_t errAsync = cudaGetLastError();
 
     if (errSync != cudaSuccess)
     {
-        // printf("Sync error: %s\n", cudaGetErrorString(errSync));
+        printf("Sync error: %s\n", cudaGetErrorString(errSync));
     }
     if (errAsync != cudaSuccess)
     {
-        // printf("Launch error: %s\n", cudaGetErrorString(errAsync));
+        printf("Launch error: %s\n", cudaGetErrorString(errAsync));
     }
     cudaFree(d_results);
     auto stop = std::chrono::high_resolution_clock::now();

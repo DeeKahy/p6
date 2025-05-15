@@ -61,6 +61,7 @@ __device__ void Tapn::step(bool *result)
     if (urgentTransitionIndex != -1)
     {
         fireTransition(urgentTransitionIndex, result);
+
         delete[] enabled;
         return;
     }
@@ -74,7 +75,6 @@ __device__ void Tapn::step(bool *result)
             lowestFiringTime = enabled[i];
         }
     }
-
     bool success = false;
     fireTransition(lowestFiringTime.index, &success);
     delete[] enabled;
@@ -94,7 +94,7 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     int consumedCount{8};
     int consumedAmount;
     transitions[index]->fire(consumed, consumedCount, &consumedAmount);
-    
+
     transitionFirings[index]++;
     steps++;
 
