@@ -17,6 +17,7 @@ for ((i = 0; i < number_of_files; i++)) do
     output=$("$binary" \
       --k-bound 8 --trace 0 --smc-parallel \
       --smc-obs-scale 500 --smc-print-cumulative-stats 4 \
+      --smc-numeric-precision 0 \
       "$model" "$current_query" 2>&1)
 
     end_time=$(date +%s%3N)  # End time in milliseconds
