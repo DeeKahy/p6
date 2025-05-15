@@ -114,7 +114,7 @@ The average number of steps before the place "finished" is marked converges to t
       <arcpath arcPointType="false" id="1" xCoord="399" yCoord="165"/>
     </arc>
     <arc id="A3" inscription="1" nameOffsetX="0" nameOffsetY="0" source="timeout" target="finished" type="normal" weight="1">
-      <hlinscription>
+      <hlinscription>a.
         <text>1'dot</text>
         <structure>
           <numberof>

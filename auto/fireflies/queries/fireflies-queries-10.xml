@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<property-set xmlns="http://tapaal.net/">
+  
+  <property>
+    <id>All fireflies synchronize</id>
+    <description>All fireflies synchronize</description>
+    <smc confidence="0.95" interval-width="0.0004" time-bound="30"/>
+    <observations>
+      <watch isEnabled="true" name="Waiting">
+        <place>net_waiting</place>
+      </watch>
+    </observations>
+    <formula>
+      <finally>
+        <conjunction>
+          <integer-eq>
+            <tokens-count>
+              <place>net_charging</place>
+            </tokens-count>
+            <integer-constant>1</integer-constant>
+          </integer-eq>
+          <integer-eq>
+            <tokens-count>
+              <place>net_flashing</place>
+            </tokens-count>
+            <integer-constant>1</integer-constant>
+          </integer-eq>
+          <integer-eq>
+            <tokens-count>
+              <place>net_waiting</place>
+            </tokens-count>
+            <integer-constant>0</integer-constant>
+          </integer-eq>
+        </conjunction>
+      </finally>
+    </formula>
+  </property>
+</property-set>
