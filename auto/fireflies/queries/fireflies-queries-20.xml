@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <property-set xmlns="http://tapaal.net/">
-  
+
   <property>
     <id>All fireflies synchronize</id>
     <description>All fireflies synchronize</description>
