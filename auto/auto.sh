@@ -29,6 +29,9 @@ for ((i = 0; i < number_of_files; i++)) do
     # Extract runs executed count (just the number)
     runs_executed=$(echo "$output" | grep -i "runs executed:" | awk '{print $3}')
 
+    # Echo result
+    echo "fireflies-queries-$i.xml,$runs_executed,$elapsed_ms"
+
     # Append data to CSV
     echo "fireflies-queries-$i.xml,$runs_executed,$elapsed_ms" >> "$output_file"
 done

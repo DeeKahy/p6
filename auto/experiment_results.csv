@@ -1,3 +1,4 @@
 query_name,runs_executed,execution_time_ms
-fireflies-queries-0.xml,18460,138
-fireflies-queries-1.xml,73793,546
+fireflies-queries-0.xml,18460,259
+fireflies-queries-1.xml,73793,892
+fireflies-queries-2.xml,204953,2971
