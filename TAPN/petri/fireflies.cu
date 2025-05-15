@@ -470,12 +470,12 @@ int main(int argc, char *argv[])
         confidence = std::stof(argv[1]);
         error = std::stof(argv[2]);
     }
-    std::cout << "confidence: " << confidence << " error: " << error << std::endl;
+    std::cout << "confidence: " << confidence << " error: " << error << "\n";
     float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
-    std::cout << "number of executions: " << number << std::endl;
+    std::cout << "number of executions: " << number << "\n";
     int loopCount = ceil(number / (blockCount *threads));
-    std::cout << "loop count: " << loopCount << std::endl;
-    std::cout << "number of executions: " << loopCount * blockCount * threads << std::endl;
+    std::cout << "loop count: " << loopCount << "\n";
+    std::cout << "number of executions: " << loopCount * blockCount * threads << "\n";
     float *d_results;
     checkCudaErrors(cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float)));
     checkCudaErrors(cudaMemset(d_results, 0, blockCount * threads * sizeof(float)));
@@ -502,6 +502,6 @@ int main(int argc, char *argv[])
     cudaFree(d_results);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    std::cout << "time run: " << duration.count() << std::endl;
+    std::cout << "time run: " << duration.count() << "\n";
     return 0;
 }
