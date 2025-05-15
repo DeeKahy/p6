@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     if (argc < 3)
     {
         confidence = 0.95f;
-        error = 0.0005f;
+        error = 0.005f;
     }
     else
     {
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     float *d_results;
 
     cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float));
-    cudaMemset((void **)&d_results, 0, blockCount * threads * sizeof(float));
+    cudaMemset(d_results, 0, blockCount * threads * sizeof(float));
     for (size_t i = 0; i < loopCount; i++)
     {
         euler<<<blockCount, threads>>>(d_results);
