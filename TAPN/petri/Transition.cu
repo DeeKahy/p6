@@ -19,21 +19,22 @@ __device__ void Transition::isReady(bool *result, float *missing)
         if (!transitionCanFire)
         {
             *result = false;
+            // printf("\nfailed\n");
             return;
         }
     }
 
-    if (!urgent)
-    {
-        // //printf("got here");
-        float test;
-        distribution->sample(&test);
-        firingTime = test;
-    }
-    else
-    {
-        firingTime = 0.0f;
-    }
+    // if (!urgent)
+    // {
+    //     // //printf("got here");
+    //     float test;
+    //     distribution->sample(&test);
+    //     firingTime = test;
+    // }
+    // else
+    // {
+    //     firingTime = 0.0f;
+    // }
 
     *result = true;
 }
@@ -48,7 +49,6 @@ __device__ void Transition::isReady(bool *result, float *missing)
  */
 __device__ void Transition::fire(float *consumed, int consumedCount, int *consumedAmout)
 {
-    // //printf("Transition firing \n");
     for (size_t i = 0; i < inputArcsCount; i++)
     {
         switch (inputArcs[i]->type)
@@ -63,9 +63,9 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
             // Inhibitor arcs don't consume tokens
             inputArcs[i]->fire(consumed, consumedAmout);
             break;
-        default:
-            // //printf("could not find type");
-            break;
+        // default:
+        //     // //printf("could not find type");
+        //     break;
         }
     }
 
@@ -90,6 +90,7 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
         }
         else
         {
+
             outputArcs[i]->fire(consumed, *consumedAmout, &success);
         }
         // //printf("Firing outputs \n");

@@ -42,8 +42,8 @@ __device__ void Arc::canFire(bool *result, float *missing)
     case INPUT:
         place->tokensHold(weight, timings, &tokensOk, missing);
         place->invariantHold(weight, &invariantsOk);
-        // //printf("tokesOk input%d \n",tokensOk);
-        // //printf("invariantsOk input %d \n",invariantsOk);
+        // printf("tokesOk input%d \n",tokensOk);
+        // printf("invariantsOk input %d \n",invariantsOk);
         *result = tokensOk && invariantsOk;
         break;
     case TRANSPORT:
@@ -72,20 +72,20 @@ __device__ void Arc::canFire(bool *result, float *missing)
  */
 __device__ void Arc::transportFire(float *outputTokens, int *outputCount)
 {
-    bool canFireResult = false;
-    float missing{0};
-    canFire(&canFireResult, &missing);
-    if (canFireResult)
-    {
+    // bool canFireResult = false;
+    // float missing{0};
+    // canFire(&canFireResult, &missing);
+    // if (canFireResult)
+    // {
         int count{0};
         place->removeTokens(weight, outputTokens, &count);
         // printf("remvoed this many tokens %d", count);
         *outputCount = count > 0 ? count : 0;
-    }
-    else
-    {
-        *outputCount = 0;
-    }
+    // }
+    // else
+    // {
+    //     *outputCount = 0;
+    // }
 }
 
 /**
@@ -97,13 +97,13 @@ __device__ void Arc::transportFire(float *outputTokens, int *outputCount)
  */
 __device__ void Arc::inputFire(float *outputTokens, int *outputCount)
 {
-    float missing{0};
-    bool canFireResult = false;
-    canFire(&canFireResult, &missing);
+    // float missing{0};
+    // bool canFireResult = false;
+    // canFire(&canFireResult, &missing);
 
-    // //printf("Input can fire \n");
-    if (canFireResult)
-    {
+    // // //printf("Input can fire \n");
+    // if (canFireResult)
+    // {
         for (size_t i = 0; i < weight; i++)
         {
             outputTokens[i] = FLT_MAX;
@@ -122,11 +122,11 @@ __device__ void Arc::inputFire(float *outputTokens, int *outputCount)
         }
         *outputCount = count;
         delete[] dummy;
-    }
-    else
-    {
-        *outputCount = 0;
-    }
+    // }
+    // else
+    // {
+    //     *outputCount = 0;
+    // }
     // //printf("Input firing success\n");
 }
 
@@ -164,11 +164,11 @@ __device__ void OutputArc::fire(float *tokens, int tokenCount, bool *success)
             // {
             //     output->addTokens(&tokens[i]);
             // }
-            for (size_t i = 0; i < tokenCount; i++)
-            {
+            // for (size_t i = 0; i < tokenCount; i++)
+            // {
 
-                // //printf("\n tokens %f\n", tokens[i]);
-            }
+            //     tokens[i]+= 1.0f;
+            // }
             output->addTokens(tokens, tokenCount);
 
             *success = true;

@@ -17,86 +17,129 @@ __device__ void Tapn::notify_observers(const SimulationEvent *event)
 
 __device__ void Tapn::step(bool *result)
 {
-    updateEnabledTransitions();
+    // updateEnabledTransitions();
 
-    EnabledTransition *enabled = new EnabledTransition[transitionsCount];
-    int enabledCount = 0;
     float missing{FLT_MAX};
     for (int i = 0; i < transitionsCount; i++)
     {
-        bool isReady = true;
+        bool isReady = false;
         transitions[i]->isReady(&isReady, &missing);
+
         if (isReady)
         {
-            enabled[enabledCount] = {i, transitions[i]->firingTime};
-            enabledCount++;
-        }
-    }
-    if (enabledCount == 0)
-    {
-        if (missing != FLT_MAX)
-        {
-            updateTokenAges(&missing);
-            steps++;
+            if (transitions[i]->firingTime == FLT_MAX)
+            {
+                if (transitions[i]->urgent == true)
+                {
+                    transitions[i]->firingTime = 0.0f;
+                }
+                else
+                {
+
+                    float test;
+                    transitions[i]->distribution->sample(&test);
+                    transitions[i]->firingTime = test;
+                }
+            }
         }
         else
         {
-            *result = false;
+            transitions[i]->firingTime = FLT_MAX;
         }
-        delete[] enabled;
+        // printf("transition %d can fire? %d firing time %f \n", i, isReady, transitions[i]->firingTime);
+    }
+    int fire{-1};
+    for (int i = 0; i < transitionsCount; i++)
+    {
+        if (transitions[i]->firingTime != FLT_MAX)
+        {
+
+            float timeDif{currentTime - transitions[i]->firingTime};
+
+            if (timeDif <= currentTime)
+            {
+                if (fire == -1)
+                {
+                    fire = i;
+                }
+                else if (transitions[i]->firingTime < transitions[fire]->firingTime)
+                {
+                    fire = i;
+                }
+            }
+            else if (missing > timeDif)
+            {
+                missing = timeDif;
+            }
+        }
+    }
+    if (fire != -1)
+    {
+        fireTransition(fire, result);
+        transitions[fire]->firingTime = FLT_MAX;
         return;
     }
-
-    int urgentTransitionIndex = -1;
-    for (size_t i = 0; i < enabledCount; i++)
+    if (missing != FLT_MAX)
     {
-        int transitionIndex = enabled[i].index;
-        if (transitions[transitionIndex]->urgent)
-        {
-            urgentTransitionIndex = transitionIndex;
-            break;
-        }
+        updateTokenAges(&missing);
     }
-
-    if (urgentTransitionIndex != -1)
+    else
     {
-        fireTransition(urgentTransitionIndex, result);
-
-        delete[] enabled;
-        return;
+        *result = false;
     }
+    // int urgentTransitionIndex = -1;
+    // for (size_t i = 0; i < enabledCount; i++)
+    // {
+    //     int transitionIndex = enabled[i].index;
+    //     if (transitions[transitionIndex]->urgent)
+    //     {
+    //         urgentTransitionIndex = transitionIndex;
+    //         break;
+    //     }
+    // }
 
-    EnabledTransition lowestFiringTime = {-1, FLT_MAX};
-    for (size_t i = 0; i < enabledCount; i++)
-    {
-        int transitionIndex = enabled[i].index;
-        if (transitions[transitionIndex]->firingTime < lowestFiringTime.firingTime)
-        {
-            lowestFiringTime = enabled[i];
-        }
-    }
-    bool success = false;
-    fireTransition(lowestFiringTime.index, &success);
-    delete[] enabled;
+    // if (urgentTransitionIndex != -1)
+    // {
+    //     fireTransition(urgentTransitionIndex, result);
+
+    //     delete[] enabled;
+    //     return;
+    // }
+
+    // EnabledTransition lowestFiringTime = {-1, FLT_MAX};
+    // for (size_t i = 0; i < enabledCount; i++)
+    // {
+    //     int transitionIndex = enabled[i].index;
+    //     if (transitions[transitionIndex]->firingTime < lowestFiringTime.firingTime)
+    //     {
+    //         lowestFiringTime = enabled[i];
+    //     }
+    // }
+    // bool success = false;
+    // fireTransition(lowestFiringTime.index, &success);
+    // delete[] enabled;
 }
 
 __device__ void Tapn::fireTransition(size_t index, bool *result)
 {
-    float firingTime = transitions[index]->firingTime;
-
-    SimulationEvent event;
-    event.type = TRANSITION_FIRING;
-    event.firing = {(int)index, firingTime};
-    SimulationEvent preEvent = event;
-    notify_observers(&preEvent);
-    // currentTime += firingTime;
+    // float firingTime = transitions[index]->firingTime;
+    // float dif{currentTime - transitions[index]->firingTime};
+    // dif = dif <= 0 ? transitions[index]->firingTime : dif;
+    // SimulationEvent event;
+    // event.type = TRANSITION_FIRING;
+    // // event.firing = {(int)index, firingTime};
+    // SimulationEvent preEvent = event;
+    // notify_observers(&preEvent);
+    // currentTime += dif;
+    // updateTokenAges(&transitions[index]->firingTime);
+    // // steps++;
     float consumed[8]{FLT_MAX};
     int consumedCount{8};
     int consumedAmount;
     transitions[index]->fire(consumed, consumedCount, &consumedAmount);
 
     transitionFirings[index]++;
-    steps++;
+    // steps++;
 
     *result = true;
 }
@@ -115,8 +158,7 @@ __device__ void Tapn::firingCount(int index, int *result)
 
 __device__ void Tapn::run()
 {
-    bool result;
-    shouldContinue(&result);
+    bool result{true};
     while (result)
     {
         step(&result);
@@ -212,12 +254,15 @@ __device__ void Tapn::run2(bool *success)
         //     }
         //     printf("\n");
         // }
-        // if ((places[4]->tokenCount + places[5]->tokenCount +
-        //          places[6]->tokenCount + places[7]->tokenCount >=
-        //      1) &&
-        //     places[13]->tokenCount == 1 &&
-        //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
-        //     places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+
+
+
+        // // if ((places[4]->tokenCount + places[5]->tokenCount +
+        // //          places[6]->tokenCount + places[7]->tokenCount >=
+        // //      1) &&
+        // //     places[13]->tokenCount == 1 &&
+        // //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
+        // //     places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
 
         if ((places[4]->tokenCount + places[5]->tokenCount +
                  places[6]->tokenCount + places[7]->tokenCount ==
@@ -236,13 +281,13 @@ __device__ void Tapn::run2(bool *success)
             return;
         }
 
-        if (currentTime < 30)
+        if (currentTime <= 30)
         {
             step(&result);
         }
         else
         {
-
+            // printf("time: %f", currentTime);
             *success = false;
             return;
         }
@@ -268,7 +313,7 @@ __device__ void Tapn::delay()
 
 __device__ void Tapn::updateTokenAges(float *delay)
 {
-
+    steps++;
     if (*delay <= 0.0f)
     {
         return;

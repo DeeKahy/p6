@@ -4,7 +4,10 @@
 #include "Invariant.h"
 #include "Transition.h"
 #include "../observer/Observer.h"
-
+struct EnabledTransition
+{
+    float firingTime;
+};
 struct Tapn
 {
     Place **places;
@@ -16,7 +19,7 @@ struct Tapn
     int steps{0};
     float currentTime{0.0f};
     int transitionFirings[20]{0};
-    
+    EnabledTransition *enabled;
     __device__ void addObserver(SimulationObserver *observer);
     __device__ void notify_observers(const SimulationEvent *event);
     __device__ void step(bool *result);
@@ -30,8 +33,3 @@ struct Tapn
     __device__ void updateEnabledTransitions();
 };
 
-struct EnabledTransition
-{
-    int index;
-    float firingTime;
-};

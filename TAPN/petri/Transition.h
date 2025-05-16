@@ -29,7 +29,7 @@ struct Transition
     OutputArc* outputArcs[5];
     int outputArcsCount{0};
     Distribution* distribution;
-    float firingTime{0.0f};
+    float firingTime{FLT_MAX};
     bool urgent;
     int id;
     
