@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     if (argc < 3)
     {
         confidence = 0.95f;
-        error = 0.005f;
+        error = 0.00005f;
     }
     else
     {

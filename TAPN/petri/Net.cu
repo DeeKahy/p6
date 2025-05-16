@@ -17,8 +17,6 @@ __device__ void Tapn::notify_observers(const SimulationEvent *event)
 
 __device__ void Tapn::step(bool *result)
 {
-    // updateEnabledTransitions();
-
     float missing{FLT_MAX};
     for (int i = 0; i < transitionsCount; i++)
     {
@@ -75,9 +73,26 @@ __device__ void Tapn::step(bool *result)
     }
     if (fire != -1)
     {
-        fireTransition(fire, result);
-        transitions[fire]->firingTime = FLT_MAX;
-        return;
+        if (missing != FLT_MAX)
+        {
+            if (currentTime - transitions[fire]->firingTime < missing)
+            {
+                fireTransition(fire, result);
+                transitions[fire]->firingTime = FLT_MAX;
+                return;
+            }
+            else
+            {
+                updateTokenAges(&missing);
+                return;
+            }
+        }
+        else
+        {
+            fireTransition(fire, result);
+            transitions[fire]->firingTime = FLT_MAX;
+            return;
+        }
     }
     if (missing != FLT_MAX)
     {
@@ -87,6 +102,7 @@ __device__ void Tapn::step(bool *result)
     {
         *result = false;
     }
+
     // int urgentTransitionIndex = -1;
     // for (size_t i = 0; i < enabledCount; i++)
     // {
@@ -136,10 +152,11 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     float consumed[8]{FLT_MAX};
     int consumedCount{8};
     int consumedAmount;
+    // updateTokenAges()
     transitions[index]->fire(consumed, consumedCount, &consumedAmount);
 
     transitionFirings[index]++;
-    // steps++;
+    steps++;
 
     *result = true;
 }
@@ -254,8 +271,6 @@ __device__ void Tapn::run2(bool *success)
         //     }
         //     printf("\n");
         // }
-
-
 
         // // if ((places[4]->tokenCount + places[5]->tokenCount +
         // //          places[6]->tokenCount + places[7]->tokenCount >=
