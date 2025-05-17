@@ -77,5 +77,5 @@ __device__ void TokenCountObserver::checkCondition(unsigned count, unsigned thre
 
 __device__ void TokenCountObserver::getShouldStop(bool *getShouldStop)
 {
-    *getShouldStop = getShouldStop;
+    // *getShouldStop = getShouldStop;
 } 

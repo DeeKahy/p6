@@ -46,10 +46,10 @@ __device__ void Place::invariantHold(int tokenCount, bool *returne)
  */
 __device__ void Place::removeTokens(int amount, float *removedTokens, int *count)
 {
-    *count = 0;
-    //printf("\nremoved before\n%f", this->tokens[0]);
-    // //printf("Removing tokens!!!\n");
-    // //printf("amount %d", amount);
+
+    // printf("\nremoved before\n%f", this->tokens[0]);
+    //  //printf("Removing tokens!!!\n");
+    //  //printf("amount %d", amount);
     for (size_t i = 0; i < amount; i++)
     {
         for (size_t j = 0; j < this->tokenCount; j++)
@@ -62,12 +62,11 @@ __device__ void Place::removeTokens(int amount, float *removedTokens, int *count
                 this->tokens[j] = FLT_MAX;
                 this->tokenCount--;
                 this->shiftTokens();
-                *count+=1;
-
+                *count += 1;
             }
         }
     }
-    //printf("\nremoved after\n%f", this->tokens[0]);
+    // printf("\nremoved after\n%f", this->tokens[0]);
 }
 
 /**
@@ -79,18 +78,21 @@ __device__ void Place::removeTokens(int amount, float *removedTokens, int *count
  * @param returne a pointer to a bool for returning the result
  * @return if enough tokens hold the timing
  */
-__device__ void Place::tokensHold(int amount, float timing[2], bool *returne)
+__device__ void Place::tokensHold(int amount, float timing[2], bool *returne, float *missing)
 {
     // //printf("Checking tokens\n");
     float minAge = timing[0];
     float maxAge = timing[1];
-
     int count{0};
     for (size_t i = 0; i < this->tokenCount; i++)
     {
         if (this->tokens[i] >= minAge && this->tokens[i] <= maxAge)
         {
             count++;
+        }
+        else if (this->tokens[i] < minAge && *missing > (minAge - this->tokens[i]))
+        {
+            *missing = minAge - this->tokens[i];
         }
     }
     // //printf("done checking tokens\n");
@@ -108,6 +110,11 @@ __device__ void Place::addTokens(float *token, int count)
 {
     // //printf("adding tokens \n");
     // //printf("token %f \n", *token);
+    if (tokenCount >= 8)
+    {
+        printf("to many tokens");
+        return;
+    }
     for (size_t i = 0; i < count; i++)
     {
         this->tokens[this->tokenCount++] = token[i];

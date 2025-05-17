@@ -17,7 +17,7 @@ struct Arc
     size_t constraint;
 
     __device__ void fire(float *outputTokens, int *maxOutput);
-    __device__ void canFire(bool *result);
+    __device__ void canFire(bool *result,float* missing);
     __device__ void transportFire(float *outputTokens, int *outputCount);
     __device__ void inputFire(float *outputTokens, int *outputCount);
     __device__ void inhibitorFire(float *outputTokens, int *outputCount);

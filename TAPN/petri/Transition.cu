@@ -2,45 +2,46 @@
 
 /**
  * @brief Checks if a transition is ready to be fired
- * 
+ *
  * @param result a pointer to a bool to indicate if it is ready
  * @return bool
  */
-__device__ void Transition::isReady(bool *result)
+__device__ void Transition::isReady(bool *result, float *missing)
 {
     // //printf("%d",inputArcsCount);
     for (size_t i = 0; i < inputArcsCount; i++)
     {
-        
+
         // Check if transition can fire
         bool transitionCanFire = false;
-        inputArcs[i]->canFire(&transitionCanFire);
+        inputArcs[i]->canFire(&transitionCanFire, missing);
 
         if (!transitionCanFire)
         {
             *result = false;
+            // printf("\nfailed\n");
             return;
         }
     }
 
-    if (!urgent)
-    {
-        // //printf("got here");
-        float test;
-        distribution->sample(&test);
-        firingTime = test;
-    }
-    else
-    {
-        firingTime = 0.0f;
-    }
+    // if (!urgent)
+    // {
+    //     // //printf("got here");
+    //     float test;
+    //     distribution->sample(&test);
+    //     firingTime = test;
+    // }
+    // else
+    // {
+    //     firingTime = 0.0f;
+    // }
 
     *result = true;
 }
 
 /**
  * @brief Function for firing a transition
- * 
+ *
  * @param consumed an array for the consumed tokens
  * @param consumedCount the maximum length of the consumed array
  * @param consumedAmout a pointer to tell how many tokens were consumed
@@ -48,7 +49,6 @@ __device__ void Transition::isReady(bool *result)
  */
 __device__ void Transition::fire(float *consumed, int consumedCount, int *consumedAmout)
 {
-    // //printf("Transition firing \n");
     for (size_t i = 0; i < inputArcsCount; i++)
     {
         switch (inputArcs[i]->type)
@@ -63,9 +63,9 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
             // Inhibitor arcs don't consume tokens
             inputArcs[i]->fire(consumed, consumedAmout);
             break;
-        default:
-            // //printf("could not find type");
-            break;
+            // default:
+            //     // //printf("could not find type");
+            //     break;
         }
     }
 
@@ -81,10 +81,16 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
         // //printf("Firing outputs \n");
         if (outputArcs[i]->isTransport)
         {
+            // for (size_t j = 0; j < *consumedAmout; j++)
+            // {
+            //     consumed[j] += firingTime;
+            // }
+
             outputArcs[i]->fire(consumed, *consumedAmout, &success);
         }
         else
         {
+
             outputArcs[i]->fire(consumed, *consumedAmout, &success);
         }
         // //printf("Firing outputs \n");
@@ -93,7 +99,7 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
 
 /**
  * @brief samples distribution function based on the type
- * 
+ *
  * @param result a pointer to a float to return to
  * @return float
  */
@@ -109,14 +115,21 @@ __device__ void Distribution::sample(float *result)
     case UNIFORM:
         // a is used for the minimum value created by the uniform distribution
         // b is used for the maximum value created by the uniform distribution
-        float min = a;
-        float max = b;
-        curandState state;
-        int tid = blockIdx.x * blockDim.x + threadIdx.x;
-        curand_init(clock64() + tid, tid, 0, &state);
-        float random = curand_uniform(&state);
-        *result = (min + random * (max - min));
+        *result = (a + curand_uniform(&state) * (b - a));
         break;
-    } // more distributions to come
-
+    case NORMAL:
+        // a is used for the for the mean by the normal distribution
+        // b is used for the maximum value created by the uniform distribution
+        *result = a + b * curand_normal(&state);
+        ;
+        break;
+    case EXPONENTIAL:
+        *result = -logf(curand_uniform(&state)) / a;
+        break; // more distributions to come
+    }
+}
+__device__ void Distribution::init()
+{
+    int tid = blockIdx.x * blockDim.x + threadIdx.x;
+    curand_init(clock64() + tid, tid, 0, &state);
 }
