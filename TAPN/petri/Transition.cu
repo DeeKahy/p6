@@ -81,10 +81,10 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
         // //printf("Firing outputs \n");
         if (outputArcs[i]->isTransport)
         {
-            for (size_t j = 0; j < *consumedAmout; j++)
-            {
-                consumed[j] += firingTime;
-            }
+            // for (size_t j = 0; j < *consumedAmout; j++)
+            // {
+            //     consumed[j] += firingTime;
+            // }
 
             outputArcs[i]->fire(consumed, *consumedAmout, &success);
         }

@@ -32,4 +32,3 @@ struct Tapn
     __device__ void updateTokenAges(float *delay);
     __device__ void updateEnabledTransitions();
 };
-

@@ -419,7 +419,7 @@ __global__ void fireflies(float *results)
     net.places = places;
     net.placesCount = 14;
 
-    Transition *transitions[17]{&tAllDone, &aArrive0, &aArrive1, &aArrive2, &aArrive3, &aReady0, &aReady1, &aReady2, &aReady3, &aFlashing0, &aFlashing1, &aFlashing2, &aFlashing3, &tFlashJointly0, &tFlashJointly1, &tFlashJointly2, &tFlashJointly3};
+    Transition *transitions[17]{ &aArrive0, &aArrive1, &aArrive2, &aArrive3, &aReady0, &aReady1, &aReady2, &aReady3, &aFlashing0, &aFlashing1, &aFlashing2, &aFlashing3, &tFlashJointly0, &tFlashJointly1, &tFlashJointly2, &tFlashJointly3, &tAllDone};
     net.transitions = transitions;
     net.transitionsCount = 17;
 

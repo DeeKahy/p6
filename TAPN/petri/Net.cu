@@ -17,6 +17,7 @@ __device__ void Tapn::notify_observers(const SimulationEvent *event)
 
 __device__ void Tapn::step(bool *result)
 {
+    int fire{-1};
     float missing{FLT_MAX};
     for (int i = 0; i < transitionsCount; i++)
     {
@@ -27,17 +28,22 @@ __device__ void Tapn::step(bool *result)
         {
             if (transitions[i]->firingTime == FLT_MAX)
             {
-                if (transitions[i]->urgent == true)
+                if (transitions[i]->urgent)
                 {
-                    transitions[i]->firingTime = 0.0f;
+                    transitions[i]->firingTime = currentTime;
                 }
                 else
                 {
-
                     float test;
                     transitions[i]->distribution->sample(&test);
-                    transitions[i]->firingTime = test;
+                    transitions[i]->firingTime = currentTime + test;
                 }
+            }
+            if (fire == -1 ||
+                (transitions[i]->urgent && !transitions[fire]->urgent) ||
+                (!transitions[i]->urgent && !transitions[fire]->urgent && transitions[i]->firingTime < transitions[fire]->firingTime))
+            {
+                fire = i;
             }
         }
         else
@@ -46,36 +52,29 @@ __device__ void Tapn::step(bool *result)
         }
         // printf("transition %d can fire? %d firing time %f \n", i, isReady, transitions[i]->firingTime);
     }
-    int fire{-1};
-    for (int i = 0; i < transitionsCount; i++)
-    {
-        if (transitions[i]->firingTime != FLT_MAX)
-        {
 
-            float timeDif{currentTime - transitions[i]->firingTime};
+    // for (int i = 0; i < transitionsCount; i++)
+    // {
+    //     if (transitions[i]->firingTime != FLT_MAX)
+    //     {
 
-            if (timeDif <= currentTime)
-            {
-                if (fire == -1)
-                {
-                    fire = i;
-                }
-                else if (transitions[i]->firingTime < transitions[fire]->firingTime)
-                {
-                    fire = i;
-                }
-            }
-            else if (missing > timeDif)
-            {
-                missing = timeDif;
-            }
-        }
-    }
+    //         if (fire == -1)
+    //         {
+    //             fire = i;
+    //         }
+    //         else if (transitions[i]->firingTime < transitions[fire]->firingTime)
+    //         {
+    //             fire = i;
+    //         }
+    //     }
+    // }
+
     if (fire != -1)
     {
         if (missing != FLT_MAX)
         {
-            if (currentTime - transitions[fire]->firingTime < missing)
+
+            if (transitions[fire]->firingTime < currentTime + missing)
             {
                 fireTransition(fire, result);
                 transitions[fire]->firingTime = FLT_MAX;
@@ -138,16 +137,23 @@ __device__ void Tapn::step(bool *result)
 
 __device__ void Tapn::fireTransition(size_t index, bool *result)
 {
-    // float firingTime = transitions[index]->firingTime;
-    // float dif{currentTime - transitions[index]->firingTime};
-    // dif = dif <= 0 ? transitions[index]->firingTime : dif;
-    // SimulationEvent event;
-    // event.type = TRANSITION_FIRING;
-    // // event.firing = {(int)index, firingTime};
-    // SimulationEvent preEvent = event;
-    // notify_observers(&preEvent);
-    // currentTime += dif;
-    // updateTokenAges(&transitions[index]->firingTime);
+
+    float firingTime = transitions[index]->firingTime;
+    if (currentTime > firingTime)
+    {
+        updateTokenAges(&firingTime);
+    }
+    else
+    {
+        firingTime = firingTime - currentTime;
+        updateTokenAges(&firingTime);
+    }
+
+    // Only advance time if the transition fires in the future
+
+    // else{
+    //     steps++;
+    // }
     // // steps++;
     float consumed[8]{FLT_MAX};
     int consumedCount{8};
@@ -156,7 +162,7 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     transitions[index]->fire(consumed, consumedCount, &consumedAmount);
 
     transitionFirings[index]++;
-    steps++;
+    // steps++;
 
     *result = true;
 }
@@ -202,20 +208,6 @@ __device__ void Tapn::run2(bool *success)
     {
         // for (size_t i = 0; i < placesCount; i++)
         // {
-        //     // 0 &waiting0,
-        //     // 1 &waiting1,
-        //     // 2 &waiting2,
-        //     // 3 &waiting3,
-        //     // 4 &charging0,
-        //     // 5 &charging1,
-        //     // 6 &charging2,
-        //     // 7 &charging3,
-        //     // 8 &charged0,
-        //     // 9 &charged1,
-        //     // 10&charged2,
-        //     // 11&charged3,
-        //     // 12&chargedSum,
-        //     // 13&flashing};
         //     switch (i)
         //     {
         //     case 0:
@@ -328,11 +320,9 @@ __device__ void Tapn::delay()
 
 __device__ void Tapn::updateTokenAges(float *delay)
 {
+
     steps++;
-    if (*delay <= 0.0f)
-    {
-        return;
-    }
+
     currentTime += *delay;
     for (size_t i = 0; i < placesCount; i++)
     {

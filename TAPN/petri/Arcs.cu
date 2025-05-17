@@ -58,7 +58,7 @@ __device__ void Arc::canFire(bool *result, float *missing)
         // place->invariantHold(weight, &invariantsOk);
         *result = tokensOk; //&& invariantsOk;
         break;
-    default:
+    // default:
         // //printf("test");
     }
 }
@@ -159,7 +159,7 @@ __device__ void OutputArc::fire(float *tokens, int tokenCount, bool *success)
     {
         if (tokenCount >= weight)
         {
-            bool addSuccess = false;
+            // bool addSuccess = false;
             // for (size_t i = 0; i < tokenCount; i++)
             // {
             //     output->addTokens(&tokens[i]);
