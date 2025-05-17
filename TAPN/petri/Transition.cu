@@ -63,9 +63,9 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
             // Inhibitor arcs don't consume tokens
             inputArcs[i]->fire(consumed, consumedAmout);
             break;
-        // default:
-        //     // //printf("could not find type");
-        //     break;
+            // default:
+            //     // //printf("could not find type");
+            //     break;
         }
     }
 
@@ -81,11 +81,11 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
         // //printf("Firing outputs \n");
         if (outputArcs[i]->isTransport)
         {
-            for (size_t i = 0; i < *consumedAmout; i++)
+            for (size_t j = 0; j < *consumedAmout; j++)
             {
-                consumed[i] += firingTime;
+                consumed[j] += firingTime;
             }
-            
+
             outputArcs[i]->fire(consumed, *consumedAmout, &success);
         }
         else
