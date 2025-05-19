@@ -470,12 +470,12 @@ int main(int argc, char *argv[])
         confidence = std::stof(argv[1]);
         error = std::stof(argv[2]);
     }
-    std::cout << "confidence: " << confidence << " error: " << error << "\n";
-    float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
-    std::cout << "number of executions: " << number << "\n";
+     std::cout << "confidence: " << confidence << " error: " << error << "\n";
+    float  number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
+    std::cout << "execution calculated: " << number << "\n";
     unsigned long long loopCount = ceil(number / (blockCount *threads));
     std::cout << "loop count: " << loopCount << "\n";
-    std::cout << "number of executions: " << loopCount * blockCount * threads << "\n";
+    std::cout << "number of executions run: " << loopCount * blockCount * threads << "\n";
     float *d_results;
     checkCudaErrors(cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float)));
     checkCudaErrors(cudaMemset(d_results, 0, blockCount * threads * sizeof(float)));
