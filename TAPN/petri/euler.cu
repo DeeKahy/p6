@@ -75,7 +75,7 @@ __global__ void euler(float *results)
     // net.step(&test);
 }
 
-__global__ void sum(float *array, int numSimulations, int totalThreads)
+__global__ void sum(float *array, unsigned long long  numSimulations, unsigned long long  totalThreads)
 {
     double total = 0.0f;
 
@@ -86,7 +86,7 @@ __global__ void sum(float *array, int numSimulations, int totalThreads)
     printf("euler value is %.11f\n", total / numSimulations);
     printf("real euler is 2.71828\n");
 }
-__global__ void summage(float *array, int numSimulations, int totalThreads)
+__global__ void summage(float *array, unsigned long long  numSimulations, unsigned long long  totalThreads)
 {
     int tid = threadIdx.x;
     double sum = 0.0f;
@@ -103,8 +103,8 @@ int main(int argc, char *argv[])
     auto start = std::chrono::high_resolution_clock::now();
     float confidence;
     float error;
-    int threads = 512;
-    int blockCount = 2048;
+    unsigned long long  threads = 512;
+    unsigned long long  blockCount = 2048;
     if (argc < 3)
     {
         confidence = 0.95f;
@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
         error = std::stof(argv[2]);
     }
     std::cout << "confidence: " << confidence << " error: " << error << "\n";
-    float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
+    unsigned long long  number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
     std::cout << "number of executions: " << number << "\n";
-    int loopCount = ceil(number / (blockCount * threads));
+    unsigned long long  loopCount = ceil(number / (blockCount * threads));
     std::cout << "loop count: " << loopCount << "\n";
     std::cout << "number of executions: " << loopCount * blockCount * threads << "\n";
     float *d_results;
