@@ -24,7 +24,6 @@ __global__ void euler(float *results)
     dis1.type = UNIFORM;
     dis1.a = 0.0f;
     dis1.b = 1.0f;
-    dis1.init();
 
     Transition trans1;
     trans1.distribution = &dis1;
@@ -68,7 +67,7 @@ __global__ void euler(float *results)
     // TokenCountObserver tokenCountObs;
     // net.addObserver(&tokenCountObs);
     net.run();
-    results[tid] += net.steps - 1;
+    results[tid] += net.steps;
     // net.step(&test);
     // //printf("\n place 0 %f\n", place1.tokens[0]);
     // net.step(&test);
@@ -116,11 +115,11 @@ int main(int argc, char *argv[])
         error = std::stof(argv[2]);
     }
     std::cout << "confidence: " << confidence << " error: " << error << "\n";
-    unsigned long long  number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
-    std::cout << "number of executions: " << number << "\n";
-    unsigned long long  loopCount = ceil(number / (blockCount * threads));
+    float  number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
+    std::cout << "execution calculated: " << number << "\n";
+    unsigned long long loopCount = ceil(number / (blockCount *threads));
     std::cout << "loop count: " << loopCount << "\n";
-    std::cout << "number of executions: " << loopCount * blockCount * threads << "\n";
+    std::cout << "number of executions run: " << loopCount * blockCount * threads << "\n";
     float *d_results;
 
     cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float));

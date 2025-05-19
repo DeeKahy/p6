@@ -18,8 +18,9 @@ struct Tapn
     int observersCount{0};
     int steps{0};
     float currentTime{0.0f};
+    float timeLimit{30.0f};
     int transitionFirings[20]{0};
-    EnabledTransition *enabled;
+    curandState state;
     __device__ void addObserver(SimulationObserver *observer);
     __device__ void notify_observers(const SimulationEvent *event);
     __device__ void step(bool *result);
@@ -31,4 +32,5 @@ struct Tapn
     __device__ void delay();
     __device__ void updateTokenAges(float *delay);
     __device__ void updateEnabledTransitions();
+    __device__ void init();
 };

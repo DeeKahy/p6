@@ -35,7 +35,7 @@ __global__ void fireflies(float *results)
     dis1.type = UNIFORM;
     dis1.a = 0.0f;
     dis1.b = 10.0f;
-    dis1.init();
+    // dis1.init();
     Arc arrive0;
     arrive0.place = &waiting0;
     arrive0.type = INPUT;
@@ -104,7 +104,7 @@ __global__ void fireflies(float *results)
     dis2.type = NORMAL;
     dis2.a = 2.0f;
     dis2.b = 0.5f;
-    dis2.init();
+    // dis2.init();
 
     Arc ready0;
     ready0.place = &charging0;
@@ -252,7 +252,7 @@ __global__ void fireflies(float *results)
     Distribution dis3;
     dis3.type = EXPONENTIAL;
     dis3.a = 0.1f;
-    dis3.init();
+    // dis3.init();
 
     Transition aFlashing0;
     aFlashing0.distribution = &dis3;
@@ -471,7 +471,7 @@ int main(int argc, char *argv[])
         error = std::stof(argv[2]);
     }
     std::cout << "confidence: " << confidence << " error: " << error << "\n";
-    float  number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
+    float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
     std::cout << "number of executions: " << number << "\n";
     unsigned long long loopCount = ceil(number / (blockCount *threads));
     std::cout << "loop count: " << loopCount << "\n";
@@ -479,9 +479,9 @@ int main(int argc, char *argv[])
     float *d_results;
     checkCudaErrors(cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float)));
     checkCudaErrors(cudaMemset(d_results, 0, blockCount * threads * sizeof(float)));
-    for (size_t i = 0; i < 1; i++)
+    for (size_t i = 0; i < loopCount; i++)
     {
-        fireflies<<<1, 1>>>(d_results);
+        fireflies<<<blockCount, threads>>>(d_results);
         checkCudaErrors(cudaDeviceSynchronize());
     }
     summage<<<1, threads>>>(d_results, blockCount * threads, threads);
