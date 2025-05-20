@@ -8,13 +8,13 @@
  */
 __device__ void Transition::isReady(bool *result, float *missing)
 {
-    // //printf("%d",inputArcsCount);
+    // printf("%d",inputArcsCount);
     for (size_t i = 0; i < inputArcsCount; i++)
     {
 
         // Check if transition can fire
         bool transitionCanFire = false;
-        inputArcs[i]->canFire(&transitionCanFire, missing);
+        inputArcs[i].canFire(&transitionCanFire, missing);
 
         if (!transitionCanFire)
         {
@@ -51,17 +51,17 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
 {
     for (size_t i = 0; i < inputArcsCount; i++)
     {
-        switch (inputArcs[i]->type)
+        switch (inputArcs[i].type)
         {
         case INPUT:
-            inputArcs[i]->fire(consumed, consumedAmout);
+            inputArcs[i].fire(consumed, consumedAmout);
             break;
         case TRANSPORT:
-            inputArcs[i]->fire(consumed, consumedAmout);
+            inputArcs[i].fire(consumed, consumedAmout);
             break;
         case INHIBITOR:
             // Inhibitor arcs don't consume tokens
-            inputArcs[i]->fire(consumed, consumedAmout);
+            inputArcs[i].fire(consumed, consumedAmout);
             break;
             // default:
             //     // //printf("could not find type");
@@ -79,19 +79,19 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
     {
         bool success;
         // //printf("Firing outputs \n");
-        if (outputArcs[i]->isTransport)
+        if (outputArcs[i].isTransport)
         {
             // for (size_t j = 0; j < *consumedAmout; j++)
             // {
             //     consumed[j] += firingTime;
             // }
 
-            outputArcs[i]->fire(consumed, *consumedAmout, &success);
+            outputArcs[i].fire(consumed, *consumedAmout, &success);
         }
         else
         {
 
-            outputArcs[i]->fire(consumed, *consumedAmout, &success);
+            outputArcs[i].fire(consumed, *consumedAmout, &success);
         }
         // //printf("Firing outputs \n");
     }

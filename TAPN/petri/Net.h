@@ -10,9 +10,9 @@ struct EnabledTransition
 };
 struct Tapn
 {
-    Place **places;
+    Place *places;
     int placesCount{0};
-    Transition **transitions;
+    Transition *transitions;
     int transitionsCount{0};
     SimulationObserver **observers;
     int observersCount{0};

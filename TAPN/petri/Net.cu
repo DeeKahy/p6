@@ -9,10 +9,10 @@ __device__ void Tapn::addObserver(SimulationObserver *observer)
 
 __device__ void Tapn::notify_observers(const SimulationEvent *event)
 {
-    for (size_t i = 0; i < observersCount; i++)
-    {
-        observers[i]->onStep(event);
-    }
+    // for (size_t i = 0; i < observersCount; i++)
+    // {
+    //     observers[i].onStep(event);
+    // }
 }
 
 __device__ void Tapn::step(bool *result)
@@ -23,46 +23,45 @@ __device__ void Tapn::step(bool *result)
     for (int i = 0; i < transitionsCount; i++)
     {
         bool isReady = false;
-        transitions[i]->isReady(&isReady, &missing);
-
+        transitions[i].isReady(&isReady, &missing);
+        // printf("%d %d %d\n",i,fire,isReady);
         if (isReady)
         {
-            if (transitions[i]->firingTime == FLT_MAX)
+            if (transitions[i].firingTime == FLT_MAX)
             {
-                if (transitions[i]->urgent)
+                if (transitions[i].urgent)
                 {
-                    transitions[i]->firingTime = 0.0f;
+                    transitions[i].firingTime = 0.0f;
                 }
                 else
                 {
                     float test;
-                    transitions[i]->distribution->sample(&state, &test);
-                    transitions[i]->firingTime = currentTime + test;
+                    transitions[i].distribution.sample(&state, &test);
+                    transitions[i].firingTime = currentTime + test;
                 }
             }
             if (fire == -1 ||
-                (transitions[i]->urgent && !transitions[fire]->urgent) ||
-                (!transitions[i]->urgent && !transitions[fire]->urgent && transitions[i]->firingTime < transitions[fire]->firingTime))
+                (transitions[i].urgent && !transitions[fire].urgent) ||
+                (!transitions[i].urgent && !transitions[fire].urgent && transitions[i].firingTime < transitions[fire].firingTime))
             {
                 fire = i;
             }
         }
         else
         {
-            transitions[i]->firingTime = FLT_MAX;
+            transitions[i].firingTime = FLT_MAX;
         }
-        // printf("transition %d can fire? %d firing time %f \n", i, isReady, transitions[i]->firingTime);
+        // printf("transition %d can fire? %d firing time %f \n", i, isReady, transitions[i].firingTime);
     }
-
     if (fire != -1)
     {
         if (missing != FLT_MAX)
         {
 
-            if (transitions[fire]->firingTime - currentTime <= missing)
+            if (transitions[fire].firingTime - currentTime <= missing)
             {
                 fireTransition(fire, result);
-                transitions[fire]->firingTime = FLT_MAX;
+                transitions[fire].firingTime = FLT_MAX;
             }
             else
             {
@@ -72,7 +71,7 @@ __device__ void Tapn::step(bool *result)
         else
         {
             fireTransition(fire, result);
-            transitions[fire]->firingTime = FLT_MAX;
+            transitions[fire].firingTime = FLT_MAX;
         }
     }
     else if (missing != FLT_MAX)
@@ -89,7 +88,7 @@ __device__ void Tapn::step(bool *result)
     // for (size_t i = 0; i < enabledCount; i++)
     // {
     //     int transitionIndex = enabled[i].index;
-    //     if (transitions[transitionIndex]->urgent)
+    //     if (transitions[transitionIndex].urgent)
     //     {
     //         urgentTransitionIndex = transitionIndex;
     //         break;
@@ -121,7 +120,7 @@ __device__ void Tapn::step(bool *result)
 __device__ void Tapn::fireTransition(size_t index, bool *result)
 {
 
-    float firingTime = transitions[index]->firingTime;
+    float firingTime = transitions[index].firingTime;
     if (firingTime > timeLimit)
     {
         *result = false;
@@ -148,7 +147,7 @@ __device__ void Tapn::fireTransition(size_t index, bool *result)
     int consumedCount{8};
     int consumedAmount;
     // updateTokenAges()
-    transitions[index]->fire(consumed, consumedCount, &consumedAmount);
+    transitions[index].fire(consumed, consumedCount, &consumedAmount);
 
     transitionFirings[index]++;
     // steps++;
@@ -233,10 +232,10 @@ __device__ void Tapn::run2(bool *success)
         //         printf("unknown state:");
         //         break;
         //     }
-        //     for (size_t j = 0; j < places[i]->tokenCount; j++)
+        //     for (size_t j = 0; j < places[i].tokenCount; j++)
         //     {
 
-        //         printf(" token number :%d value: %f", j, places[i]->tokens[j]);
+        //         printf(" token number :%d value: %f", j, places[i].tokens[j]);
         //     }
         //     printf("\n");
         // }
@@ -248,12 +247,12 @@ __device__ void Tapn::run2(bool *success)
         //     places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
         //     places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
 
-        if ((places[4]->tokenCount + places[5]->tokenCount +
-                 places[6]->tokenCount + places[7]->tokenCount ==
+        if ((places[4].tokenCount + places[5].tokenCount +
+                 places[6].tokenCount + places[7].tokenCount ==
              1) &&
-            places[13]->tokenCount == 1 &&
-            places[0]->tokenCount == 0 && places[1]->tokenCount == 0 &&
-            places[2]->tokenCount == 0 && places[3]->tokenCount == 0)
+            places[13].tokenCount == 1 &&
+            places[0].tokenCount == 0 && places[1].tokenCount == 0 &&
+            places[2].tokenCount == 0 && places[3].tokenCount == 0)
         {
             *success = true;
             return;
@@ -264,15 +263,15 @@ __device__ void Tapn::run2(bool *success)
 
 __device__ void Tapn::shouldContinue(bool *result)
 {
-    for (size_t i = 0; i < observersCount; i++)
-    {
-        observers[i]->getShouldStop(result);
-        if (*result)
-        {
-            return;
-        }
-    }
-    *result = true;
+    // for (size_t i = 0; i < observersCount; i++)
+    // {
+    //     observers[i].getShouldStop(result);
+    //     if (*result)
+    //     {
+    //         return;
+    //     }
+    // }
+    // *result = true;
 }
 
 __device__ void Tapn::delay()
@@ -285,9 +284,9 @@ __device__ void Tapn::updateTokenAges(float *delay)
     currentTime += *delay;
     for (size_t i = 0; i < placesCount; i++)
     {
-        for (size_t j = 0; j < places[i]->tokenCount; j++)
+        for (size_t j = 0; j < places[i].tokenCount; j++)
         {
-            places[i]->tokens[j] += *delay;
+            places[i].tokens[j] += *delay;
         }
     }
 }
@@ -298,7 +297,7 @@ __device__ void Tapn::updateEnabledTransitions()
     bool ready{true};
     for (size_t i = 0; i < transitionsCount; i++)
     {
-        transitions[i]->isReady(&ready, &missing);
+        transitions[i].isReady(&ready, &missing);
     }
 }
 __device__ void Tapn::init()
