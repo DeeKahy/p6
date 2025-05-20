@@ -2,6 +2,7 @@
 
 number_of_files=$(find ./fireflies/queries -type f | wc -l)
 output_file="experiment_results.csv"
+full_output_file="full_out"
 
 # Write CSV header
 echo "query_name,runs_executed,execution_time_ms" > "$output_file"
@@ -34,6 +35,9 @@ for ((i = 0; i < number_of_files; i++)) do
 
     # Append data to CSV
     echo "fireflies-queries-$i.xml,$runs_executed,$elapsed_ms" >> "$output_file"
+
+    # Append full output for each run
+    echo "$output" >> "$full_output_file"
 done
 
 echo "Results saved to $output_file"

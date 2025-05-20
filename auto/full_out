@@ -1,0 +1,222 @@
+Missing query-indexes for query-file (which is identified as XML-format), assuming only first query is to be verified
+MC: 1
+SMC Verification (all irrelevant options will be ignored)
+Model file is: ./fireflies/fireflies.xml
+Query file is: ./fireflies/queries/fireflies-queries-0.xml
+Starting SMC...
+Need to execute 18445 runs to produce estimation
+. Using 16 threads...
+  runs executed:	18460
+  average run length:	2.72709
+  average run duration:	1
+  verification time:	0.0102973s
+  run duration (std. dev.):	0
+  run length (std. dev.):	0.879927
+  statistics of valid runs:
+    number of valid runs: 18460
+    duration of a valid run (average):	1
+    duration of a valid run (std. dev.):	0
+    length of a valid run (average):	2.72709
+    length of a valid run (std. dev.):	0.879927
+  no violating runs, unable to compute specific statistics
+  cumulative probability / step :
+0:0;2:0;2:0.4944;3:0.4944;3:0.8317;4:0.8317;4:0.9572;5:0.9572;5:0.9917;6:0.9917;6:0.9983;7:0.9983;7:0.9997;8:0.9997;8:0.9999;9:0.9999;9:1;
+  cumulative probability / delay :
+0:0;0.9995:0;0.9995:1;1:1;1:1;
+
+TRANSITION STATISTICS
+<Euler_delay;1.72709> <Euler_timeout;1>
+
+
+PLACE-BOUND STATISTICS
+<Euler_accumulated_time;1> <Euler_finished;1>
+
+Max number of tokens found in any reachable marking: 0
+Probability estimation:
+	Confidence: 95%
+	P = 1 ± 0.01
+Missing query-indexes for query-file (which is identified as XML-format), assuming only first query is to be verified
+MC: 1
+SMC Verification (all irrelevant options will be ignored)
+Model file is: ./fireflies/fireflies.xml
+Query file is: ./fireflies/queries/fireflies-queries-1.xml
+Starting SMC...
+Need to execute 73778 runs to produce estimation
+. Using 16 threads...
+  runs executed:	73793
+  average run length:	2.72141
+  average run duration:	1
+  verification time:	0.0352664s
+  run duration (std. dev.):	0
+  run length (std. dev.):	0.878532
+  statistics of valid runs:
+    number of valid runs: 73793
+    duration of a valid run (average):	1
+    duration of a valid run (std. dev.):	0
+    length of a valid run (average):	2.72141
+    length of a valid run (std. dev.):	0.878532
+  no violating runs, unable to compute specific statistics
+  cumulative probability / step :
+0:0;2:0;2:0.4988;3:0.4988;3:0.8325;4:0.8325;4:0.9577;5:0.9577;5:0.9914;6:0.9914;6:0.9985;7:0.9985;7:0.9998;8:0.9998;8:1;9:1;9:1;
+  cumulative probability / delay :
+0:0;0.9995:0;0.9995:1;1:1;1:1;
+
+TRANSITION STATISTICS
+<Euler_delay;1.72141> <Euler_timeout;1>
+
+
+PLACE-BOUND STATISTICS
+<Euler_accumulated_time;1> <Euler_finished;1>
+
+Max number of tokens found in any reachable marking: 0
+Probability estimation:
+	Confidence: 95%
+	P = 1 ± 0.005
+Missing query-indexes for query-file (which is identified as XML-format), assuming only first query is to be verified
+MC: 1
+SMC Verification (all irrelevant options will be ignored)
+Model file is: ./fireflies/fireflies.xml
+Query file is: ./fireflies/queries/fireflies-queries-2.xml
+Starting SMC...
+Need to execute 204938 runs to produce estimation
+. Using 16 threads...
+  runs executed:	204953
+  average run length:	2.71755
+  average run duration:	1
+  verification time:	0.0922665s
+  run duration (std. dev.):	0
+  run length (std. dev.):	0.874773
+  statistics of valid runs:
+    number of valid runs: 204953
+    duration of a valid run (average):	1
+    duration of a valid run (std. dev.):	0
+    length of a valid run (average):	2.71755
+    length of a valid run (std. dev.):	0.874773
+  no violating runs, unable to compute specific statistics
+  cumulative probability / step :
+0:0;2.002:0;2.002:0.5006;2.9975:0.5006;2.9975:0.8335;3.9985:0.8335;3.9985:0.9581;4.9995:0.9581;4.9995:0.9918;6.0005:0.9918;6.0005:0.9986;7.0015:0.9986;7.0015:0.9998;8.0025:0.9998;8.0025:1;10:1;10:1;
+  cumulative probability / delay :
+0:0;0.9995:0;0.9995:1;1:1;1:1;
+
+TRANSITION STATISTICS
+<Euler_delay;1.71755> <Euler_timeout;1>
+
+
+PLACE-BOUND STATISTICS
+<Euler_accumulated_time;1> <Euler_finished;1>
+
+Max number of tokens found in any reachable marking: 0
+Probability estimation:
+	Confidence: 95%
+	P = 1 ± 0.003
+Missing query-indexes for query-file (which is identified as XML-format), assuming only first query is to be verified
+MC: 1
+SMC Verification (all irrelevant options will be ignored)
+Model file is: ./fireflies/fireflies.xml
+Query file is: ./fireflies/queries/fireflies-queries-3.xml
+Starting SMC...
+Need to execute 461110 runs to produce estimation
+. Using 16 threads...
+  runs executed:	461125
+  average run length:	2.71901
+  average run duration:	1
+  verification time:	0.202468s
+  run duration (std. dev.):	0
+  run length (std. dev.):	0.87662
+  statistics of valid runs:
+    number of valid runs: 461125
+    duration of a valid run (average):	1
+    duration of a valid run (std. dev.):	0
+    length of a valid run (average):	2.71901
+    length of a valid run (std. dev.):	0.87662
+  no violating runs, unable to compute specific statistics
+  cumulative probability / step :
+0:0;2.002:0;2.002:0.5003;2.9975:0.5003;2.9975:0.8328;3.9985:0.8328;3.9985:0.9578;4.9995:0.9578;4.9995:0.9918;6.0005:0.9918;6.0005:0.9986;7.0015:0.9986;7.0015:0.9998;8.0025:0.9998;8.0025:1;10:1;10:1;
+  cumulative probability / delay :
+0:0;0.9995:0;0.9995:1;1:1;1:1;
+
+TRANSITION STATISTICS
+<Euler_delay;1.71901> <Euler_timeout;1>
+
+
+PLACE-BOUND STATISTICS
+<Euler_accumulated_time;1> <Euler_finished;1>
+
+Max number of tokens found in any reachable marking: 0
+Probability estimation:
+	Confidence: 95%
+	P = 1 ± 0.002
+Missing query-indexes for query-file (which is identified as XML-format), assuming only first query is to be verified
+MC: 1
+SMC Verification (all irrelevant options will be ignored)
+Model file is: ./fireflies/fireflies.xml
+Query file is: ./fireflies/queries/fireflies-queries-4.xml
+Starting SMC...
+Need to execute 1844440 runs to produce estimation
+. Using 16 threads...
+  runs executed:	1844455
+  average run length:	2.71836
+  average run duration:	1
+  verification time:	0.762316s
+  run duration (std. dev.):	0
+  run length (std. dev.):	0.875503
+  statistics of valid runs:
+    number of valid runs: 1844455
+    duration of a valid run (average):	1
+    duration of a valid run (std. dev.):	0
+    length of a valid run (average):	2.71836
+    length of a valid run (std. dev.):	0.875503
+  no violating runs, unable to compute specific statistics
+  cumulative probability / step :
+0:0;2.002:0;2.002:0.5001;2.9975:0.5001;2.9975:0.8333;3.9985:0.8333;3.9985:0.9582;4.9995:0.9582;4.9995:0.9917;6.0005:0.9917;6.0005:0.9986;7.0015:0.9986;7.0015:0.9998;8.0025:0.9998;8.0025:1;10:1;10:1;
+  cumulative probability / delay :
+0:0;0.9995:0;0.9995:1;1:1;1:1;
+
+TRANSITION STATISTICS
+<Euler_delay;1.71836> <Euler_timeout;1>
+
+
+PLACE-BOUND STATISTICS
+<Euler_accumulated_time;1> <Euler_finished;1>
+
+Max number of tokens found in any reachable marking: 0
+Probability estimation:
+	Confidence: 95%
+	P = 1 ± 0.001
+Missing query-indexes for query-file (which is identified as XML-format), assuming only first query is to be verified
+MC: 1
+SMC Verification (all irrelevant options will be ignored)
+Model file is: ./fireflies/fireflies.xml
+Query file is: ./fireflies/queries/fireflies-queries-5.xml
+Starting SMC...
+Need to execute 2277086 runs to produce estimation
+. Using 16 threads...
+  runs executed:	2277101
+  average run length:	2.71843
+  average run duration:	1
+  verification time:	0.873781s
+  run duration (std. dev.):	0
+  run length (std. dev.):	0.875305
+  statistics of valid runs:
+    number of valid runs: 2277101
+    duration of a valid run (average):	1
+    duration of a valid run (std. dev.):	0
+    length of a valid run (average):	2.71843
+    length of a valid run (std. dev.):	0.875305
+  no violating runs, unable to compute specific statistics
+  cumulative probability / step :
+0:0;2.002:0;2.002:0.5001;2.9975:0.5001;2.9975:0.8331;3.9985:0.8331;3.9985:0.9583;4.9995:0.9583;4.9995:0.9917;6.0005:0.9917;6.0005:0.9986;7.0015:0.9986;7.0015:0.9998;8.0025:0.9998;8.0025:1;10:1;10:1;
+  cumulative probability / delay :
+0:0;0.9995:0;0.9995:1;1:1;1:1;
+
+TRANSITION STATISTICS
+<Euler_delay;1.71843> <Euler_timeout;1>
+
+
+PLACE-BOUND STATISTICS
+<Euler_accumulated_time;1> <Euler_finished;1>
+
+Max number of tokens found in any reachable marking: 0
+Probability estimation:
+	Confidence: 95%
+	P = 1 ± 0.0009
