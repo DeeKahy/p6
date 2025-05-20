@@ -35,7 +35,7 @@ __global__ void fireflies(float *results)
     dis1.type = UNIFORM;
     dis1.a = 0.0f;
     dis1.b = 10.0f;
-    dis1.init();
+    // dis1.init();
     Arc arrive0;
     arrive0.place = &waiting0;
     arrive0.type = INPUT;
@@ -104,7 +104,7 @@ __global__ void fireflies(float *results)
     dis2.type = NORMAL;
     dis2.a = 2.0f;
     dis2.b = 0.5f;
-    dis2.init();
+    // dis2.init();
 
     Arc ready0;
     ready0.place = &charging0;
@@ -252,7 +252,7 @@ __global__ void fireflies(float *results)
     Distribution dis3;
     dis3.type = EXPONENTIAL;
     dis3.a = 0.1f;
-    dis3.init();
+    // dis3.init();
 
     Transition aFlashing0;
     aFlashing0.distribution = &dis3;
@@ -430,7 +430,7 @@ __global__ void fireflies(float *results)
     results[tid] += success;
     // lenghts[tid] += net.steps;
 }
-__global__ void sum(float *array, int numSimulations, int totalThreads)
+__global__ void sum(float *array, unsigned long long  numSimulations, unsigned long long  totalThreads)
 {
     double total = 0;
 
@@ -440,7 +440,7 @@ __global__ void sum(float *array, int numSimulations, int totalThreads)
     }
     printf("success rate is %.11f\n", total / numSimulations);
 }
-__global__ void summage(float *array, int numSimulations, int totalThreads)
+__global__ void summage(float *array, unsigned long long  numSimulations, unsigned long long  totalThreads)
 {
     int tid = threadIdx.x;
     double sum = 0;
@@ -458,8 +458,8 @@ int main(int argc, char *argv[])
     auto start = std::chrono::high_resolution_clock::now();
     float confidence;
     float error;
-    int threads = 256;
-    int blockCount = 512;
+    unsigned long long  threads = 256;
+    unsigned long long  blockCount = 512;
     if (argc < 3)
     {
         confidence = 0.95f;
@@ -470,12 +470,12 @@ int main(int argc, char *argv[])
         confidence = std::stof(argv[1]);
         error = std::stof(argv[2]);
     }
-    std::cout << "confidence: " << confidence << " error: " << error << "\n";
-    float number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
-    std::cout << "number of executions: " << number << "\n";
-    int loopCount = ceil(number / (blockCount *threads));
+     std::cout << "confidence: " << confidence << " error: " << error << "\n";
+    float  number = ceil((log(2 / (1 - confidence))) / (2 * error * error));
+    std::cout << "execution calculated: " << number << "\n";
+    unsigned long long loopCount = ceil(number / (blockCount *threads));
     std::cout << "loop count: " << loopCount << "\n";
-    std::cout << "number of executions: " << loopCount * blockCount * threads << "\n";
+    std::cout << "number of executions run: " << loopCount * blockCount * threads << "\n";
     float *d_results;
     checkCudaErrors(cudaMalloc((void **)&d_results, blockCount * threads * sizeof(float)));
     checkCudaErrors(cudaMemset(d_results, 0, blockCount * threads * sizeof(float)));

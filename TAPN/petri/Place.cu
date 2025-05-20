@@ -90,7 +90,7 @@ __device__ void Place::tokensHold(int amount, float timing[2], bool *returne, fl
         {
             count++;
         }
-        else if (this->tokens[i] < minAge && *missing > (minAge - this->tokens[i]))
+        else if (this->tokens[i] < minAge && *missing > (minAge-this->tokens[i]))
         {
             *missing = minAge - this->tokens[i];
         }

@@ -103,7 +103,7 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
  * @param result a pointer to a float to return to
  * @return float
  */
-__device__ void Distribution::sample(float *result)
+__device__ void Distribution::sample(curandState* state, float *result)
 {
 
     switch (type)
@@ -115,21 +115,21 @@ __device__ void Distribution::sample(float *result)
     case UNIFORM:
         // a is used for the minimum value created by the uniform distribution
         // b is used for the maximum value created by the uniform distribution
-        *result = (a + curand_uniform(&state) * (b - a));
+        *result = (a + curand_uniform(state) * (b - a));
         break;
     case NORMAL:
         // a is used for the for the mean by the normal distribution
         // b is used for the maximum value created by the uniform distribution
-        *result = a + b * curand_normal(&state);
+        *result = a + b * curand_normal(state);
         ;
         break;
     case EXPONENTIAL:
-        *result = -logf(curand_uniform(&state)) / a;
+        *result = -logf(curand_uniform(state)) / a;
         break; // more distributions to come
     }
 }
-__device__ void Distribution::init()
-{
-    int tid = blockIdx.x * blockDim.x + threadIdx.x;
-    curand_init(clock64() + tid, tid, 0, &state);
-}
+// __device__ void Distribution::init()
+// {
+//     int tid = blockIdx.x * blockDim.x + threadIdx.x;
+//     curand_init(clock64() + tid, tid, 0, &state);
+// }

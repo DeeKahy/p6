@@ -14,7 +14,7 @@ for param in "${parameters[@]}"; do
     echo "------------------------------------------------" | tee -a "$output_file"
 
     # Run command and capture all output directly to file and terminal
-    steam-run ./fireflies "$fixed_arg" "$param" 2>&1 | tee -a "$output_file"
+    ./fireflies "$fixed_arg" "$param" 2>&1 | tee -a "$output_file"
 
     # Add time information and separator after the run
     echo "" | tee -a "$output_file"
