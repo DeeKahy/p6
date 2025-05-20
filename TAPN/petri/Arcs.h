@@ -27,7 +27,7 @@ struct OutputArc
 {
     Place *output;
     size_t weight{1};
-    bool isTransport;
+    bool isTransport {false};
 
     __device__ void fire(float *tokens, int tokenCount, bool *success);
 };

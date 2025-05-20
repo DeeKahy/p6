@@ -41,7 +41,6 @@ __global__ void euler(float *results)
     transitions[1].inputArcs[0].timings[0] = 1.0f;
     transitions[1].inputArcs[0].timings[1] = FLT_MAX;
     transitions[1].inputArcsCount++;
-    transitions[1].outputArcs[0].isTransport = false;
     transitions[1].outputArcs[0].output = &places[1];
     transitions[1].outputArcsCount++;
 

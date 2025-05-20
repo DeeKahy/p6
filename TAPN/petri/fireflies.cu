@@ -46,7 +46,6 @@ __global__ void fireflies(float *results)
     transitions[0].inputArcs[0].timings[1] = FLT_MAX;
     transitions[0].inputArcsCount++;
 
-    transitions[0].outputArcs[0].isTransport = false;
     transitions[0].outputArcs[0].output = &places[4];
     transitions[0].outputArcsCount++;
 
@@ -58,7 +57,6 @@ __global__ void fireflies(float *results)
     transitions[1].inputArcs[0].timings[0] = 0.0f;
     transitions[1].inputArcs[0].timings[1] = FLT_MAX;
     transitions[1].inputArcsCount++;
-    transitions[1].outputArcs[0].isTransport = false;
     transitions[1].outputArcs[0].output = &places[5];
     transitions[1].outputArcsCount++;
 
@@ -70,7 +68,6 @@ __global__ void fireflies(float *results)
     transitions[2].inputArcs[0].timings[0] = 0.0f;
     transitions[2].inputArcs[0].timings[1] = FLT_MAX;
     transitions[2].inputArcsCount++;
-    transitions[2].outputArcs[0].isTransport = false;
     transitions[2].outputArcs[0].output = &places[6];
     transitions[2].outputArcsCount++;
 
@@ -82,7 +79,6 @@ __global__ void fireflies(float *results)
     transitions[3].inputArcs[0].timings[0] = 0.0f;
     transitions[3].inputArcs[0].timings[1] = FLT_MAX;
     transitions[3].inputArcsCount++;
-    transitions[3].outputArcs[0].isTransport = false;
     transitions[3].outputArcs[0].output = &places[7];
     transitions[3].outputArcsCount++;
 
@@ -95,10 +91,8 @@ __global__ void fireflies(float *results)
     transitions[4].inputArcs[0].timings[0] = 1.0f;
     transitions[4].inputArcs[0].timings[1] = FLT_MAX;
     transitions[4].inputArcsCount++;
-    transitions[4].outputArcs[0].isTransport = false;
     transitions[4].outputArcs[0].output = &places[8];
     transitions[4].outputArcsCount++;
-    transitions[4].outputArcs[1].isTransport = false;
     transitions[4].outputArcs[1].output = &places[12];
     transitions[4].outputArcsCount++;
 
@@ -110,10 +104,8 @@ __global__ void fireflies(float *results)
     transitions[5].inputArcs[0].timings[0] = 1.0f;
     transitions[5].inputArcs[0].timings[1] = FLT_MAX;
     transitions[5].inputArcsCount++;
-    transitions[5].outputArcs[0].isTransport = false;
     transitions[5].outputArcs[0].output = &places[9];
     transitions[5].outputArcsCount++;
-    transitions[5].outputArcs[1].isTransport = false;
     transitions[5].outputArcs[1].output = &places[12];
     transitions[5].outputArcsCount++;
 
@@ -125,10 +117,8 @@ __global__ void fireflies(float *results)
     transitions[6].inputArcs[0].timings[0] = 1.0f;
     transitions[6].inputArcs[0].timings[1] = FLT_MAX;
     transitions[6].inputArcsCount++;
-    transitions[6].outputArcs[0].isTransport = false;
     transitions[6].outputArcs[0].output = &places[10];
     transitions[6].outputArcsCount++;
-    transitions[6].outputArcs[1].isTransport = false;
     transitions[6].outputArcs[1].output = &places[12];
     transitions[6].outputArcsCount++;
 
@@ -140,10 +130,8 @@ __global__ void fireflies(float *results)
     transitions[7].inputArcs[0].timings[0] = 1.0f;
     transitions[7].inputArcs[0].timings[1] = FLT_MAX;
     transitions[7].inputArcsCount++;
-    transitions[7].outputArcs[0].isTransport = false;
     transitions[7].outputArcs[0].output = &places[11];
     transitions[7].outputArcsCount++;
-    transitions[7].outputArcs[1].isTransport = false;
     transitions[7].outputArcs[1].output = &places[12];
     transitions[7].outputArcsCount++;
 
@@ -165,10 +153,8 @@ __global__ void fireflies(float *results)
     transitions[8].inputArcs[2].timings[0] = 0.0f;
     transitions[8].inputArcs[2].timings[1] = FLT_MAX;
     transitions[8].inputArcsCount++;
-    transitions[8].outputArcs[0].isTransport = false;
     transitions[8].outputArcs[0].output = &places[13];
     transitions[8].outputArcsCount++;
-    transitions[8].outputArcs[1].isTransport = false;
     transitions[8].outputArcs[1].output = &places[4];
     transitions[8].outputArcsCount++;
 
@@ -190,10 +176,8 @@ __global__ void fireflies(float *results)
     transitions[9].inputArcs[2].timings[0] = 0.0f;
     transitions[9].inputArcs[2].timings[1] = FLT_MAX;
     transitions[9].inputArcsCount++;
-    transitions[9].outputArcs[0].isTransport = false;
     transitions[9].outputArcs[0].output = &places[13];
     transitions[9].outputArcsCount++;
-    transitions[9].outputArcs[1].isTransport = false;
     transitions[9].outputArcs[1].output = &places[5];
     transitions[9].outputArcsCount++;
 
@@ -215,10 +199,8 @@ __global__ void fireflies(float *results)
     transitions[10].inputArcs[2].timings[0] = 0.0f;
     transitions[10].inputArcs[2].timings[1] = FLT_MAX;
     transitions[10].inputArcsCount++;
-    transitions[10].outputArcs[0].isTransport = false;
     transitions[10].outputArcs[0].output = &places[13];
     transitions[10].outputArcsCount++;
-    transitions[10].outputArcs[1].isTransport = false;
     transitions[10].outputArcs[1].output = &places[6];
     transitions[10].outputArcsCount++;
 
@@ -240,10 +222,8 @@ __global__ void fireflies(float *results)
     transitions[11].inputArcs[2].timings[0] = 0.0f;
     transitions[11].inputArcs[2].timings[1] = FLT_MAX;
     transitions[11].inputArcsCount++;
-    transitions[11].outputArcs[0].isTransport = false;
     transitions[11].outputArcs[0].output = &places[13];
     transitions[11].outputArcsCount++;
-    transitions[11].outputArcs[1].isTransport = false;
     transitions[11].outputArcs[1].output = &places[7];
     transitions[11].outputArcsCount++;
 
@@ -285,10 +265,8 @@ __global__ void fireflies(float *results)
     transitions[12].inputArcs[2].timings[0] = 0.0f;
     transitions[12].inputArcs[2].timings[1] = FLT_MAX;
     transitions[12].inputArcsCount++;
-    transitions[12].outputArcs[0].isTransport = false;
     transitions[12].outputArcs[0].output = &places[13];
     transitions[12].outputArcsCount++;
-    transitions[12].outputArcs[1].isTransport = false;
     transitions[12].outputArcs[1].output = &places[4];
     transitions[12].outputArcsCount++;
 
@@ -310,10 +288,8 @@ __global__ void fireflies(float *results)
     transitions[13].inputArcs[2].timings[0] = 0.0f;
     transitions[13].inputArcs[2].timings[1] = FLT_MAX;
     transitions[13].inputArcsCount++;
-    transitions[13].outputArcs[0].isTransport = false;
     transitions[13].outputArcs[0].output = &places[13];
     transitions[13].outputArcsCount++;
-    transitions[13].outputArcs[1].isTransport = false;
     transitions[13].outputArcs[1].output = &places[5];
     transitions[13].outputArcsCount++;
 
@@ -335,10 +311,8 @@ __global__ void fireflies(float *results)
     transitions[14].inputArcs[2].timings[0] = 0.0f;
     transitions[14].inputArcs[2].timings[1] = FLT_MAX;
     transitions[14].inputArcsCount++;
-    transitions[14].outputArcs[0].isTransport = false;
     transitions[14].outputArcs[0].output = &places[13];
     transitions[14].outputArcsCount++;
-    transitions[14].outputArcs[1].isTransport = false;
     transitions[14].outputArcs[1].output = &places[6];
     transitions[14].outputArcsCount++;
 
@@ -360,10 +334,8 @@ __global__ void fireflies(float *results)
     transitions[15].inputArcs[2].timings[0] = 0.0f;
     transitions[15].inputArcs[2].timings[1] = FLT_MAX;
     transitions[15].inputArcsCount++;
-    transitions[15].outputArcs[0].isTransport = false;
     transitions[15].outputArcs[0].output = &places[13];
     transitions[15].outputArcsCount++;
-    transitions[15].outputArcs[1].isTransport = false;
     transitions[15].outputArcs[1].output = &places[7];
     transitions[15].outputArcsCount++;
 
