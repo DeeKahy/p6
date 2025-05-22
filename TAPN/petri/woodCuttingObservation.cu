@@ -9,7 +9,7 @@
             exit(EXIT_FAILURE);                                                          \
         }                                                                                \
     }
-__global__ void euler(float *results)
+__global__ void wood(float *results)
 {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -17,49 +17,57 @@ __global__ void euler(float *results)
     Transition transitions[2];
     net.currentTime = 0.0f;
     net.steps = 0;
-    Place places[2];
-    float token = 0.0f;
-    float tokens[1]{token};
-    places[0].addTokens(tokens, 1);
-    transitions[0].distribution.a = 0.0f;
-    transitions[0].distribution.b = 1.0f;
-    transitions[0].distribution.type = UNIFORM;
+    Place places[20];
+    net.placesCount = 20;
+    net.transitions = transitions;
+    net.transitionsCount = 2;
 
-    transitions[0].inputArcs[0].place = 0;
-    transitions[0].inputArcs[0].type = TRANSPORT;
-    transitions[0].inputArcs[0].timings[0] = 0.0f;
-    transitions[0].inputArcs[0].timings[1] = FLT_MAX;
-    transitions[0].inputArcsCount++;
-    transitions[0].outputArcs[0].isTransport = true;
+    transitions[0].distribution.type = EXPONENTIAL;
+    transitions[0].distribution.a = 0.06f;
     transitions[0].outputArcs[0].output = 0;
     transitions[0].outputArcsCount++;
 
-    transitions[1].distribution.a = 0.0f;
-    transitions[1].distribution.type = CONSTANT;
-    transitions[1].inputArcs[0].place = 0;
-    transitions[1].inputArcs[0].type = INPUT;
-    transitions[1].inputArcs[0].timings[0] = 1.0f;
-    transitions[1].inputArcs[0].timings[1] = FLT_MAX;
-    transitions[1].inputArcsCount++;
-    transitions[1].outputArcs[0].output = 1;
+    transitions[1].distribution.type = EXPONENTIAL;
+    transitions[1].distribution.a = 0.0828f;
+    transitions[1].outputArcs[0].output = 0;
     transitions[1].outputArcsCount++;
 
-    net.placesCount = 2;
-    net.transitions = transitions;
-    net.transitionsCount = 2;
-    // TokenAgeObserver tokenAgeObs(MAXFLOAT);
-    // net.addObserver(&tokenAgeObs);
-    // TokenCountObserver tokenCountObs;
-    // net.addObserver(&tokenCountObs);
+    transitions[2].distribution.type = EXPONENTIAL;
+    transitions[2].distribution.a = 0.000718f;
+    transitions[2].outputArcs[0].output = 0;
+    transitions[2].outputArcsCount++;
 
+    transitions[3].distribution.type = CONSTANT;
+    transitions[3].distribution.a = 0.0f;
+    transitions[3].urgent = true;
+    transitions[3].inputArcs[0].place = 0;
+    transitions[3].inputArcs[0].type = INPUT;
+    transitions[3].inputArcs[0].timings[0] = 0.0f;
+    transitions[3].inputArcs[0].timings[1] = FLT_MAX;
+    transitions[3].inputArcsCount++;
+    transitions[3].outputArcs[0].output = 1;
+    transitions[3].outputArcsCount++;
+
+    transitions[4].distribution.type = CONSTANT;
+    transitions[4].distribution.a = 0.0556f;
+    transitions[4].inputArcs[0].place = 1;
+    transitions[4].inputArcs[0].type = INPUT;
+    transitions[4].inputArcs[0].timings[0] = 0.0f;
+    transitions[4].inputArcs[0].timings[1] = FLT_MAX;
+    transitions[4].inputArcsCount++;
+    transitions[4].inputArcs[1].place = 5;
+    transitions[4].inputArcs[1].type = INHIBITOR;
+    transitions[4].inputArcs[1].timings[0] = 0.0f;
+    transitions[4].inputArcs[1].timings[1] = FLT_MAX;
+    transitions[4].inputArcsCount++;
+    transitions[4].outputArcs[0].output = 2;
+    transitions[4].outputArcsCount++;
+
+
+    
     net.run(places);
-    // printf("\n%f\n",net.currentTime);
-    results[tid] += net.steps;
 
-    // net.step(&test);
-    // //printf("\n place 0 %f\n", place1.tokens[0]);
-    // net.step(&test);
-    // net.step(&test);
+    results[tid] += net.steps;
 }
 
 __global__ void sum(float *array, unsigned long long numSimulations, unsigned long long totalThreads)
@@ -114,7 +122,7 @@ int main(int argc, char *argv[])
     cudaMemset(d_results, 0, N * sizeof(float));
     for (size_t i = 0; i < loopCount; i++)
     {
-        euler<<<blockCount, threads>>>(d_results);
+        wood<<<blockCount, threads>>>(d_results);
         cudaDeviceSynchronize();
     }
 
