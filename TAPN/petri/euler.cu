@@ -12,39 +12,38 @@
 __global__ void euler(float *results)
 {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
+
     Tapn net;
-    Place places[2];
     Transition transitions[2];
+    net.currentTime = 0.0f;
+    net.steps = 0;
+    Place places[2];
     float token = 0.0f;
     float tokens[1]{token};
     places[0].addTokens(tokens, 1);
-
-
     transitions[0].distribution.a = 0.0f;
     transitions[0].distribution.b = 1.0f;
     transitions[0].distribution.type = UNIFORM;
 
-    transitions[0].inputArcs[0].place = &places[0];
+    transitions[0].inputArcs[0].place = 0;
     transitions[0].inputArcs[0].type = TRANSPORT;
     transitions[0].inputArcs[0].timings[0] = 0.0f;
     transitions[0].inputArcs[0].timings[1] = FLT_MAX;
     transitions[0].inputArcsCount++;
     transitions[0].outputArcs[0].isTransport = true;
-    transitions[0].outputArcs[0].output = &places[0];
+    transitions[0].outputArcs[0].output = 0;
     transitions[0].outputArcsCount++;
-
 
     transitions[1].distribution.a = 0.0f;
     transitions[1].distribution.type = CONSTANT;
-    transitions[1].inputArcs[0].place = &places[0];
+    transitions[1].inputArcs[0].place = 0;
     transitions[1].inputArcs[0].type = INPUT;
     transitions[1].inputArcs[0].timings[0] = 1.0f;
     transitions[1].inputArcs[0].timings[1] = FLT_MAX;
     transitions[1].inputArcsCount++;
-    transitions[1].outputArcs[0].output = &places[1];
+    transitions[1].outputArcs[0].output = 1;
     transitions[1].outputArcsCount++;
 
-    net.places = places;
     net.placesCount = 2;
     net.transitions = transitions;
     net.transitionsCount = 2;
@@ -52,9 +51,11 @@ __global__ void euler(float *results)
     // net.addObserver(&tokenAgeObs);
     // TokenCountObserver tokenCountObs;
     // net.addObserver(&tokenCountObs);
-    net.run();
+
+    net.run(places);
     // printf("\n%f\n",net.currentTime);
     results[tid] += net.steps;
+
     // net.step(&test);
     // //printf("\n place 0 %f\n", place1.tokens[0]);
     // net.step(&test);
@@ -109,8 +110,8 @@ int main(int argc, char *argv[])
     unsigned long long N{blockCount * threads};
     std::cout << "number of executions run: " << N * loopCount << "\n";
     float *d_results;
-    checkCudaErrors(cudaMalloc((void **)&d_results, N * sizeof(float)));
-    checkCudaErrors(cudaMemset(d_results, 0, N * sizeof(float)));
+    cudaMalloc((void **)&d_results, N * sizeof(float));
+    cudaMemset(d_results, 0, N * sizeof(float));
     for (size_t i = 0; i < loopCount; i++)
     {
         euler<<<blockCount, threads>>>(d_results);

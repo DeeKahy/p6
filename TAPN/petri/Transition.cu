@@ -6,7 +6,7 @@
  * @param result a pointer to a bool to indicate if it is ready
  * @return bool
  */
-__device__ void Transition::isReady(bool *result, float *missing)
+__device__ void Transition::isReady(bool *result, float *missing, Place* realplaces)
 {
     // printf("%d",inputArcsCount);
     for (size_t i = 0; i < inputArcsCount; i++)
@@ -14,7 +14,7 @@ __device__ void Transition::isReady(bool *result, float *missing)
 
         // Check if transition can fire
         bool transitionCanFire = false;
-        inputArcs[i].canFire(&transitionCanFire, missing);
+        inputArcs[i].canFire(&transitionCanFire, missing, realplaces);
 
         if (!transitionCanFire)
         {
@@ -47,21 +47,21 @@ __device__ void Transition::isReady(bool *result, float *missing)
  * @param consumedAmout a pointer to tell how many tokens were consumed
  * @return The filled array and the amount consumed
  */
-__device__ void Transition::fire(float *consumed, int consumedCount, int *consumedAmout)
+__device__ void Transition::fire(float *consumed, int consumedCount, int *consumedAmout, Place* realplaces)
 {
     for (size_t i = 0; i < inputArcsCount; i++)
     {
         switch (inputArcs[i].type)
         {
         case INPUT:
-            inputArcs[i].fire(consumed, consumedAmout);
+            inputArcs[i].fire(consumed, consumedAmout,realplaces);
             break;
         case TRANSPORT:
-            inputArcs[i].fire(consumed, consumedAmout);
+            inputArcs[i].fire(consumed, consumedAmout,realplaces);
             break;
         case INHIBITOR:
             // Inhibitor arcs don't consume tokens
-            inputArcs[i].fire(consumed, consumedAmout);
+            inputArcs[i].fire(consumed, consumedAmout,realplaces);
             break;
             // default:
             //     // //printf("could not find type");
@@ -86,12 +86,12 @@ __device__ void Transition::fire(float *consumed, int consumedCount, int *consum
             //     consumed[j] += firingTime;
             // }
 
-            outputArcs[i].fire(consumed, *consumedAmout, &success);
+            outputArcs[i].fire(consumed, *consumedAmout, &success,realplaces);
         }
         else
         {
 
-            outputArcs[i].fire(consumed, *consumedAmout, &success);
+            outputArcs[i].fire(consumed, *consumedAmout, &success,realplaces);
         }
         // //printf("Firing outputs \n");
     }

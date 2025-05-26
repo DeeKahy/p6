@@ -33,6 +33,6 @@ struct Transition
     bool urgent;
     int id;
 
-    __device__ void fire(float *consumed, int consumedCount, int *consumedAmout);
-    __device__ void isReady(bool *result, float *missing);
+    __device__ void fire(float *consumed, int consumedCount, int *consumedAmout, Place* realplaces);
+    __device__ void isReady(bool *result, float *missing, Place* realplaces);
 };
