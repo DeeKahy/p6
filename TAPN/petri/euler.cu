@@ -9,18 +9,13 @@
             exit(EXIT_FAILURE);                                                          \
         }                                                                                \
     }
-__global__ void euler(float *results)
+__global__ void euler(float *results, unsigned long long loopCount)
 {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
     Tapn net;
     Transition transitions[2];
-    net.currentTime = 0.0f;
-    net.steps = 0;
-    Place places[2];
-    float token = 0.0f;
-    float tokens[1]{token};
-    places[0].addTokens(tokens, 1);
+
     transitions[0].distribution.a = 0.0f;
     transitions[0].distribution.b = 1.0f;
     transitions[0].distribution.type = UNIFORM;
@@ -51,8 +46,17 @@ __global__ void euler(float *results)
     // net.addObserver(&tokenAgeObs);
     // TokenCountObserver tokenCountObs;
     // net.addObserver(&tokenCountObs);
+    for (size_t i = 0; i < loopCount; i++)
+    {
+        net.currentTime = 0.0f;
+        net.steps = 0;
+        Place places[2];
+        float token = 0.0f;
+        float tokens[1]{token};
+        places[0].addTokens(tokens, 1);
+        net.run(places);
+    }
 
-    net.run(places);
     // printf("\n%f\n",net.currentTime);
     results[tid] += net.steps;
 
@@ -112,15 +116,13 @@ int main(int argc, char *argv[])
     float *d_results;
     cudaMalloc((void **)&d_results, N * sizeof(float));
     cudaMemset(d_results, 0, N * sizeof(float));
-    for (size_t i = 0; i < loopCount; i++)
-    {
-        euler<<<blockCount, threads>>>(d_results);
-        cudaDeviceSynchronize();
-    }
+
+    euler<<<blockCount, threads>>>(d_results, loopCount);
+    cudaDeviceSynchronize();
 
     thrust::device_ptr<float> d_ptr = thrust::device_pointer_cast(d_results);
     double tot = thrust::reduce(d_ptr, d_ptr + N);
-    std::cout << "Success rate: " << tot / (N * loopCount) << "\n";
+    std::cout << "Success rate: " << std::setprecision(15) << tot / (N * loopCount) << "\n";
     cudaError_t errSync = cudaDeviceSynchronize();
     cudaError_t errAsync = cudaGetLastError();
 

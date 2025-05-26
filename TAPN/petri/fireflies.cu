@@ -12,22 +12,13 @@
         }                                                                                \
     }
 
-__global__ void fireflies(float *results)
+__global__ void fireflies(float *results, unsigned long long loopCount)
 {
     // printf("start of fireflies");
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
     Tapn net;
     Transition transitions[17];
-    float token = 0.0f;
-    float tokens[1]{token};
-    // starting transitions transitions
-    // printf("waiting and tokens");
 
-    Place places[14];
-    places[0].addTokens(tokens, 1);
-    places[1].addTokens(tokens, 1);
-    places[2].addTokens(tokens, 1);
-    places[3].addTokens(tokens, 1);
     // dis1.init();
 
     transitions[0].distribution.a = 0.0f;
@@ -336,13 +327,26 @@ __global__ void fireflies(float *results)
     net.transitionsCount = 17;
     // TokenCountObserver observer;
     // net.addObserver(&observer);
+    float token = 0.0f;
+    float tokens[1]{token};
+    for (size_t i = 0; i < loopCount; i++)
+    {
 
-    net.currentTime = 0.0f;
-    net.steps = 0;
+        // starting transitions transitions
+        // printf("waiting and tokens");
 
-    bool success{false};
-    net.run2(&success, places);
-    results[tid] += success;
+        Place places[14];
+        places[0].addTokens(tokens, 1);
+        places[1].addTokens(tokens, 1);
+        places[2].addTokens(tokens, 1);
+        places[3].addTokens(tokens, 1);
+        net.currentTime = 0.0f;
+        net.steps = 0;
+        bool success{false};
+        net.run2(&success, places);
+        results[tid] += success;
+    }
+
     // lenghts[tid] += net.steps;
 }
 __global__ void sum(float *array, unsigned long long numSimulations, unsigned long long totalThreads)
@@ -373,7 +377,7 @@ int main(int argc, char *argv[])
     auto start = std::chrono::high_resolution_clock::now();
     float confidence;
     float error;
-    unsigned long long threads = 1024;
+    unsigned long long threads = 256;
     unsigned long long blockCount = 2048;
     if (argc < 3)
     {
@@ -395,11 +399,10 @@ int main(int argc, char *argv[])
     float *d_results;
     checkCudaErrors(cudaMalloc((void **)&d_results, N * sizeof(float)));
     checkCudaErrors(cudaMemset(d_results, 0, N * sizeof(float)));
-    for (size_t i = 0; i < loopCount; i++)
-    {
-        fireflies<<<blockCount, threads>>>(d_results);
-        checkCudaErrors(cudaDeviceSynchronize());
-    }
+
+    fireflies<<<blockCount, threads>>>(d_results, loopCount);
+    checkCudaErrors(cudaDeviceSynchronize());
+
     thrust::device_ptr<float> d_ptr = thrust::device_pointer_cast(d_results);
     double tot = thrust::reduce(d_ptr, d_ptr + N);
     std::cout << "Success rate: " << tot / (N * loopCount) << "\n";
