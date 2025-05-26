@@ -118,7 +118,6 @@ __device__ void Arc::inputFire(float *outputTokens, int *outputCount, Place *pla
         *outputCount = 0;
     }
     *outputCount = count;
-    delete[] dummy;
     // }
     // else
     // {
