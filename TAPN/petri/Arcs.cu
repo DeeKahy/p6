@@ -107,7 +107,7 @@ __device__ void Arc::inputFire(float *outputTokens, int *outputCount, Place *pla
     }
     *outputCount = weight;
 
-    float *dummy = new float[weight]{FLT_MAX};
+    float dummy[8]{FLT_MAX};
     bool removeSuccess = false;
 
     // //printf("Trying to remove\n");
