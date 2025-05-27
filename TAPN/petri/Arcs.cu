@@ -7,18 +7,18 @@
  * @param outputCount the amount of tokens cosumed
  * @return tokens and how many tokens where consumed
  */
-__device__ void Arc::fire(float *outputTokens, int *outputCount)
+__device__ void Arc::fire(float *outputTokens, int *outputCount, Place *places)
 {
     // //printf("%d",type);
     switch (type)
     {
     case INPUT:
         // //printf("Input firing \n");
-        inputFire(outputTokens, outputCount);
+        inputFire(outputTokens, outputCount, places);
         break;
     case TRANSPORT:
         // printf("Transport firing \n");
-        transportFire(outputTokens, outputCount);
+        transportFire(outputTokens, outputCount, places);
         break;
     case INHIBITOR:
         // //printf("Inhibitor firing \n");
@@ -33,35 +33,32 @@ __device__ void Arc::fire(float *outputTokens, int *outputCount)
  * @param result a pointer to a bool for indicating if an arc can fire
  * @return a boolean value indicating if an arc is able to fire
  */
-__device__ void Arc::canFire(bool *result, float *missing)
+// Update the canFire method to use indices instead of pointers
+__device__ void Arc::canFire(bool *result, float *missing, Place *places)
 {
     bool tokensOk;
     bool invariantsOk;
     switch (type)
     {
     case INPUT:
-        place->tokensHold(weight, timings, &tokensOk, missing);
-        place->invariantHold(weight, &invariantsOk);
-        // printf("tokesOk input%d \n",tokensOk);
-        // printf("invariantsOk input %d \n",invariantsOk);
+        // Use place as an index into the places array
+        places[place].tokensHold(weight, timings, &tokensOk, missing);
+        places[place].invariantHold(weight, &invariantsOk);
         *result = tokensOk && invariantsOk;
         break;
     case TRANSPORT:
-        place->tokensHold(weight, timings, &tokensOk, missing);
-        place->invariantHold(weight, &invariantsOk);
-        // //printf("tokesOk transport %d \n",tokensOk);
-        // //printf("invariantsOk  transpot %d \n",invariantsOk);
+        places[place].tokensHold(weight, timings, &tokensOk, missing);
+        places[place].invariantHold(weight, &invariantsOk);
         *result = tokensOk && invariantsOk;
         break;
     case INHIBITOR:
-        tokensOk = (place->tokenCount < constraint);
-        // place->invariantHold(weight, &invariantsOk);
-        *result = tokensOk; //&& invariantsOk;
+        tokensOk = (places[place].tokenCount < constraint);
+        *result = tokensOk;
         break;
-    // default:
-        // //printf("test");
     }
 }
+
+// Similarly update the other methods in Arc and OutputArc
 
 /**
  * @brief firing function for input transport arcs
@@ -70,17 +67,17 @@ __device__ void Arc::canFire(bool *result, float *missing)
  * @param outputCount the amount of tokens cosumed
  * @return tokens and how many tokens where consumed
  */
-__device__ void Arc::transportFire(float *outputTokens, int *outputCount)
+__device__ void Arc::transportFire(float *outputTokens, int *outputCount, Place *places)
 {
     // bool canFireResult = false;
     // float missing{0};
     // canFire(&canFireResult, &missing);
     // if (canFireResult)
     // {
-        int count{0};
-        place->removeTokens(weight, outputTokens, &count);
-        // printf("remvoed this many tokens %d", count);
-        *outputCount = count > 0 ? count : 0;
+    int count{0};
+    places[place].removeTokens(weight, outputTokens, &count);
+    // printf("remvoed this many tokens %d", count);
+    *outputCount = count > 0 ? count : 0;
     // }
     // else
     // {
@@ -95,7 +92,7 @@ __device__ void Arc::transportFire(float *outputTokens, int *outputCount)
  * @param outputCount the amount of tokens cosumed
  * @return tokens and how many tokens where consumed
  */
-__device__ void Arc::inputFire(float *outputTokens, int *outputCount)
+__device__ void Arc::inputFire(float *outputTokens, int *outputCount, Place *places)
 {
     // float missing{0};
     // bool canFireResult = false;
@@ -104,24 +101,23 @@ __device__ void Arc::inputFire(float *outputTokens, int *outputCount)
     // // //printf("Input can fire \n");
     // if (canFireResult)
     // {
-        for (size_t i = 0; i < weight; i++)
-        {
-            outputTokens[i] = FLT_MAX;
-        }
-        *outputCount = weight;
+    for (size_t i = 0; i < weight; i++)
+    {
+        outputTokens[i] = FLT_MAX;
+    }
+    *outputCount = weight;
 
-        float *dummy = new float[weight]{FLT_MAX};
-        bool removeSuccess = false;
+    float dummy[8]{FLT_MAX};
+    bool removeSuccess = false;
 
-        // //printf("Trying to remove\n");
-        int count{0};
-        place->removeTokens(weight, dummy, &count);
-        if (!removeSuccess)
-        {
-            *outputCount = 0;
-        }
-        *outputCount = count;
-        delete[] dummy;
+    // //printf("Trying to remove\n");
+    int count{0};
+    places[place].removeTokens(weight, dummy, &count);
+    if (!removeSuccess)
+    {
+        *outputCount = 0;
+    }
+    *outputCount = count;
     // }
     // else
     // {
@@ -152,7 +148,7 @@ __device__ void Arc::inhibitorFire(float *outputTokens, int *outputCount)
  * @param success a pointer to a bool to indicate a success
  * @return bool
  */
-__device__ void OutputArc::fire(float *tokens, int tokenCount, bool *success)
+__device__ void OutputArc::fire(float *tokens, int tokenCount, bool *success, Place *places)
 {
     // //printf("\n token count%d\n",tokenCount);
     if (isTransport)
@@ -169,7 +165,7 @@ __device__ void OutputArc::fire(float *tokens, int tokenCount, bool *success)
 
             //     tokens[i]+= 1.0f;
             // }
-            output->addTokens(tokens, tokenCount);
+            places[output].addTokens(tokens, tokenCount);
 
             *success = true;
         }
@@ -183,7 +179,7 @@ __device__ void OutputArc::fire(float *tokens, int tokenCount, bool *success)
         // //printf("Output firing \n");
         float newToken = 0.0f;
         bool addSuccess = false;
-        output->addTokens(&newToken /* , weight, &addSuccess */, 1);
+        places[output].addTokens(&newToken /* , weight, &addSuccess */, 1);
         *success = addSuccess;
     }
 }

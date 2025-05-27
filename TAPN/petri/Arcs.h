@@ -11,23 +11,25 @@ enum ArcType
 struct Arc
 {
     ArcType type;
-    Place *place;
+    // Place *place;
+    int place;
     size_t weight{1};
     float timings[2];
     size_t constraint;
 
-    __device__ void fire(float *outputTokens, int *maxOutput);
-    __device__ void canFire(bool *result,float* missing);
-    __device__ void transportFire(float *outputTokens, int *outputCount);
-    __device__ void inputFire(float *outputTokens, int *outputCount);
+    __device__ void fire(float *outputTokens, int *maxOutput, Place *places);
+    __device__ void canFire(bool *result, float *missing, Place *places);
+    __device__ void transportFire(float *outputTokens, int *outputCount, Place *places);
+    __device__ void inputFire(float *outputTokens, int *outputCount, Place *places);
     __device__ void inhibitorFire(float *outputTokens, int *outputCount);
 };
 
 struct OutputArc
 {
-    Place *output;
+    // Place *output;
+    int output;
     size_t weight{1};
-    bool isTransport;
+    bool isTransport{false};
 
-    __device__ void fire(float *tokens, int tokenCount, bool *success);
+    __device__ void fire(float *tokens, int tokenCount, bool *success, Place *places);
 };

@@ -13,3 +13,5 @@
 #include <curand_kernel.h>
 #include <cfloat>
 #include "../observer/Observer.h"
+#include <thrust/device_ptr.h>
+#include <thrust/reduce.h>

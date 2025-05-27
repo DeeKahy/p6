@@ -24,15 +24,15 @@ struct Distribution
 struct Transition
 {
 
-    Arc *inputArcs[5];
+    Arc inputArcs[5];
     int inputArcsCount{0};
-    OutputArc *outputArcs[5];
+    OutputArc outputArcs[5];
     int outputArcsCount{0};
-    Distribution *distribution;
+    Distribution distribution;
     float firingTime{FLT_MAX};
     bool urgent;
     int id;
 
-    __device__ void fire(float *consumed, int consumedCount, int *consumedAmout);
-    __device__ void isReady(bool *result, float *missing);
+    __device__ void fire(float *consumed, int consumedCount, int *consumedAmout, Place* realplaces);
+    __device__ void isReady(bool *result, float *missing, Place* realplaces);
 };
