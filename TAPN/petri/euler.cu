@@ -55,10 +55,10 @@ __global__ void euler(float *results, unsigned long long loopCount)
         float tokens[1]{token};
         places[0].addTokens(tokens, 1);
         net.run(places);
+        results[tid] += net.steps;
     }
 
     // printf("\n%f\n",net.currentTime);
-    results[tid] += net.steps;
 
     // net.step(&test);
     // //printf("\n place 0 %f\n", place1.tokens[0]);
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     auto start = std::chrono::high_resolution_clock::now();
     float confidence;
     float error;
-    unsigned long long threads = 1024;
+    unsigned long long threads = 256;
     unsigned long long blockCount = 2048;
     if (argc < 3)
     {
